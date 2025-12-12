@@ -17,6 +17,29 @@ namespace ProjectQuanLySinhVien.GUI
             LoadDataComboBox(); // Load danh sách Lớp và Môn ngay khi mở
         }
 
+        // Helper: get actual value from ComboBox (handles DataRowView)
+        private object GetComboBoxValue(ComboBox cb)
+        {
+            if (cb == null) return null;
+            var sv = cb.SelectedValue;
+            if (sv == null) return null;
+            if (sv is DataRowView drv)
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(cb.ValueMember) && drv.Row.Table.Columns.Contains(cb.ValueMember))
+                        return drv[cb.ValueMember];
+                    // fallback to first column
+                    return drv.Row.ItemArray.Length > 0 ? drv.Row.ItemArray[0] : drv.ToString();
+                }
+                catch
+                {
+                    return drv.ToString();
+                }
+            }
+            return sv;
+        }
+
         // --- 1. LOAD DỮ LIỆU CHO COMBOBOX ---
         private void LoadDataComboBox()
         {
@@ -52,7 +75,7 @@ namespace ProjectQuanLySinhVien.GUI
         private void LoadDiemSinhVien()
         {
             // Chỉ load khi đã chọn đủ cả Lớp và Môn
-            if (cboLop.SelectedValue == null || cboMonHoc.SelectedValue == null) return;
+            if (GetComboBoxValue(cboLop) == null || GetComboBoxValue(cboMonHoc) == null) return;
 
             try
             {
@@ -69,8 +92,10 @@ namespace ProjectQuanLySinhVien.GUI
                     WHERE sv.MaLop = @maLop";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@maMH", cboMonHoc.SelectedValue);
-                cmd.Parameters.AddWithValue("@maLop", cboLop.SelectedValue);
+                var maMH = GetComboBoxValue(cboMonHoc);
+                var maLop = GetComboBoxValue(cboLop);
+                cmd.Parameters.AddWithValue("@maMH", maMH ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@maLop", maLop ?? (object)DBNull.Value);
 
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
@@ -97,9 +122,9 @@ namespace ProjectQuanLySinhVien.GUI
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-                txtMaSV.Text = row.Cells["colMaSV"].Value.ToString();
-                txtTenSV.Text = row.Cells["colTenSV"].Value.ToString();
-                txtDiem.Text = row.Cells["colDiem"].Value.ToString();
+                txtMaSV.Text = row.Cells["colMaSV"].Value?.ToString() ?? "";
+                txtTenSV.Text = row.Cells["colTenSV"].Value?.ToString() ?? "";
+                txtDiem.Text = row.Cells["colDiem"].Value?.ToString() ?? "";
 
                 txtDiem.Focus(); // Đặt con trỏ vào ô nhập điểm ngay
             }
@@ -170,7 +195,8 @@ namespace ProjectQuanLySinhVien.GUI
                     // Code xóa đặc biệt vì Delete không cần tham số DiemSo
                     SqlCommand cmd = new SqlCommand(sql, conn);
                     cmd.Parameters.AddWithValue("@sv", txtMaSV.Text);
-                    cmd.Parameters.AddWithValue("@mh", cboMonHoc.SelectedValue);
+                    var maMH = GetComboBoxValue(cboMonHoc);
+                    cmd.Parameters.AddWithValue("@mh", maMH ?? (object)DBNull.Value);
                     cmd.ExecuteNonQuery();
 
                     MessageBox.Show("Xóa điểm thành công!");
@@ -190,12 +216,12 @@ namespace ProjectQuanLySinhVien.GUI
             txtDiem.Text = "";
         }
 
-        // --- CÁC HÀM PHỤ TRỢ (Để code gọn hơn) ---
+        // --- CÁC HÀM PHỤ TRỢ (ĐỂ CODE GỌN HƠN) ---
 
         // 1. Kiểm tra đầu vào
         private bool CheckInput()
         {
-            if (txtMaSV.Text == "" || cboMonHoc.SelectedValue == null)
+            if (txtMaSV.Text == "" || GetComboBoxValue(cboMonHoc) == null)
             {
                 MessageBox.Show("Vui lòng chọn Sinh viên và Môn học!");
                 return false;
@@ -215,7 +241,8 @@ namespace ProjectQuanLySinhVien.GUI
             string check = "SELECT COUNT(*) FROM KETQUA WHERE MaSV=@sv AND MaMH=@mh";
             SqlCommand cmdCheck = new SqlCommand(check, conn);
             cmdCheck.Parameters.AddWithValue("@sv", txtMaSV.Text);
-            cmdCheck.Parameters.AddWithValue("@mh", cboMonHoc.SelectedValue);
+            var maMH = GetComboBoxValue(cboMonHoc);
+            cmdCheck.Parameters.AddWithValue("@mh", maMH ?? (object)DBNull.Value);
             int count = (int)cmdCheck.ExecuteScalar();
             return count > 0;
         }
@@ -225,7 +252,8 @@ namespace ProjectQuanLySinhVien.GUI
         {
             SqlCommand cmd = new SqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@sv", txtMaSV.Text);
-            cmd.Parameters.AddWithValue("@mh", cboMonHoc.SelectedValue);
+            var maMH = GetComboBoxValue(cboMonHoc);
+            cmd.Parameters.AddWithValue("@mh", maMH ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@d", float.Parse(txtDiem.Text));
             cmd.ExecuteNonQuery();
         }
