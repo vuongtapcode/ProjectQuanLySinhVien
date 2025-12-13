@@ -1,0 +1,98 @@
+﻿
+CREATE DATABASE QLSV_DB
+GO
+
+USE QLSV_DB
+GO
+
+-- 1. BẢNG KHOA
+CREATE TABLE KHOA (
+    MaKhoa NVARCHAR(20) PRIMARY KEY,
+    TenKhoa NVARCHAR(100) NOT NULL
+)
+GO
+
+-- 2. BẢNG MÔN HỌC
+CREATE TABLE MONHOC (
+    MaMH NVARCHAR(20) PRIMARY KEY,
+    TenMH NVARCHAR(100) NOT NULL,
+    SoTinChi INT DEFAULT 3
+)
+GO
+
+-- 3. BẢNG LỚP
+CREATE TABLE LOP (
+    MaLop NVARCHAR(20) PRIMARY KEY,
+    TenLop NVARCHAR(100) NOT NULL,
+    MaKhoa NVARCHAR(20) REFERENCES KHOA(MaKhoa)
+)
+GO
+
+-- 4. BẢNG SINH VIÊN
+CREATE TABLE SINHVIEN (
+    MaSV NVARCHAR(20) PRIMARY KEY,
+    HoTen NVARCHAR(100) NOT NULL,
+    NgaySinh DATE,
+    GioiTinh NVARCHAR(10),
+    QueQuan NVARCHAR(200),
+    MaLop NVARCHAR(20) REFERENCES LOP(MaLop)
+)
+GO
+
+-- 5. BẢNG KẾT QUẢ
+CREATE TABLE KETQUA (
+    MaSV NVARCHAR(20) REFERENCES SINHVIEN(MaSV),
+    MaMH NVARCHAR(20) REFERENCES MONHOC(MaMH),
+    DiemSo FLOAT,
+    PRIMARY KEY (MaSV, MaMH) 
+)
+GO
+
+-- 6. BẢNG TÀI KHOẢN
+CREATE TABLE ACCOUNT (
+    UserName VARCHAR(100) PRIMARY KEY,
+    DisplayName NVARCHAR(100) NOT NULL,
+    PassWord VARCHAR(1000) NOT NULL, 
+    Type INT DEFAULT 0 -- 1: Admin, 0: Staff
+)
+GO
+
+----------------------------------------------------------------------
+-- NHẬP DỮ LIỆU MẪU 
+----------------------------------------------------------------------
+
+-- KHOA
+INSERT INTO KHOA VALUES ('CNTT', N'Công nghệ thông tin')
+INSERT INTO KHOA VALUES ('KT', N'Kinh tế')
+INSERT INTO KHOA VALUES ('NN', N'Ngoại ngữ')
+INSERT INTO KHOA VALUES ('QTKD', N'Quản trị kinh doanh')
+
+-- LỚP
+INSERT INTO LOP VALUES ('K11', N'Lớp 11 - CNTT', 'CNTT')
+INSERT INTO LOP VALUES ('K12', N'Lớp 12 - Kinh tế', 'KT')
+INSERT INTO LOP VALUES ('K13', N'Lớp 13 - Ngoại ngữ', 'NN')
+
+-- MÔN HỌC
+INSERT INTO MONHOC VALUES ('CSDL', N'Cơ sở dữ liệu', 3)
+INSERT INTO MONHOC VALUES ('CTDLGT', N'Cấu trúc dữ liệu & GT', 4)
+INSERT INTO MONHOC VALUES ('THDC', N'Tin học đại cương', 4)
+INSERT INTO MONHOC VALUES ('LTC', N'Lập trình C#', 3)
+INSERT INTO MONHOC VALUES ('CTRR', N'Cấu trúc rời rạc', 3)
+
+-- SINH VIÊN 
+INSERT INTO SINHVIEN VALUES ('SV001', N'Nguyễn Văn A', '1986-01-27', N'Nam', N'Tp.HCM', 'K11')
+INSERT INTO SINHVIEN VALUES ('SV002', N'Trần Ngọc Hân', '1986-03-14', N'Nữ', N'Kiên Giang', 'K11')
+INSERT INTO SINHVIEN VALUES ('SV003', N'Hà Duy Lập', '1986-04-18', N'Nam', N'Nghệ An', 'K11')
+INSERT INTO SINHVIEN VALUES ('SV004', N'Trần Ngọc Linh', '1986-03-30', N'Nữ', N'Tây Ninh', 'K12')
+INSERT INTO SINHVIEN VALUES ('SV005', N'Lê Nhật Minh', '1986-01-24', N'Nam', N'Tp.HCM', 'K12')
+INSERT INTO SINHVIEN VALUES ('SV006', N'Nguyễn Thị Kim Cúc', '1986-09-06', N'Nữ', N'Kiên Giang', 'K13')
+
+-- KẾT QUẢ THI
+INSERT INTO KETQUA VALUES ('SV001', 'CSDL', 8.5)
+INSERT INTO KETQUA VALUES ('SV001', 'LTC', 9.0)
+INSERT INTO KETQUA VALUES ('SV002', 'CSDL', 5.0)
+INSERT INTO KETQUA VALUES ('SV003', 'THDC', 7.5)
+INSERT INTO KETQUA VALUES ('SV004', 'CTRR', 6.0) 
+-- TÀI KHOẢN (Pass: 1)
+INSERT INTO ACCOUNT VALUES ('admin', N'Quản trị viên', '1', 1)
+INSERT INTO ACCOUNT VALUES ('staff', N'Nhân viên', '1', 0)
