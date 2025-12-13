@@ -26,5 +26,25 @@ namespace ProjectQuanLySinhVien.Properties
                 return defaultInstance;
             }
         }
+
+        // User-scoped setting for SavedUsername
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SavedUsername
+        {
+            get { return ((string)(this["SavedUsername"])); }
+            set { this["SavedUsername"] = value; }
+        }
+
+        // User-scoped setting for SavedPassword
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SavedPassword
+        {
+            get { return ((string)(this["SavedPassword"])); }
+            set { this["SavedPassword"] = value; }
+        }
     }
 }
