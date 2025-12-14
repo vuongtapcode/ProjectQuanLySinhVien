@@ -1,41 +1,41 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient; // Thư viện kết nối SQL
+using System.Data.SqlClient;
 using System.Windows.Forms;
+using ProjectQuanLySinhVien.DTO; // Nhớ dòng này
 
 namespace ProjectQuanLySinhVien.GUI
 {
     public partial class fDangNhap : Form
     {
-        // 1. Chuỗi kết nối (Nhớ sửa tên máy của bạn nếu cần)
+        // Chuỗi kết nối
         string strKetNoi = @"Data Source=DESKTOP-E2VL8VG\SQLEXPRESS;Initial Catalog=QLSV_DB;Integrated Security=True";
-        SqlConnection conn = null;
 
         public fDangNhap()
         {
             InitializeComponent();
         }
 
-        // --- SỰ KIỆN 1: KHI FORM VỪA MỞ LÊN (Tự điền pass cũ nếu có) ---
+        // --- SỰ KIỆN: KHI FORM VỪA MỞ LÊN ---
         private void fDangNhap_Load(object sender, EventArgs e)
         {
             try
             {
-                // Nếu trước đó đã lưu thì tự điền
+                // Tự động điền nếu đã lưu trước đó
                 if (!string.IsNullOrEmpty(Properties.Settings.Default.SavedUsername))
                 {
                     txbTaiKhoan.Text = Properties.Settings.Default.SavedUsername;
                     txbMatKhau.Text = Properties.Settings.Default.SavedPassword;
-                    chkGhiNho.Checked = true;
+                    chkGhiNho.Checked = true; // Tích sẵn vào ô ghi nhớ
                 }
             }
             catch
             {
-                // Ignore if settings missing
+                // Bỏ qua lỗi nếu chưa có Setting
             }
         }
 
-        // --- SỰ KIỆN 2: BẤM NÚT ĐĂNG NHẬP ---
+        // --- SỰ KIỆN: BẤM NÚT ĐĂNG NHẬP ---
         private void btnDangNhap_Click(object sender, EventArgs e)
         {
             string taiKhoan = txbTaiKhoan.Text;
@@ -44,36 +44,34 @@ namespace ProjectQuanLySinhVien.GUI
             // 1. Kiểm tra rỗng
             if (string.IsNullOrEmpty(taiKhoan) || string.IsNullOrEmpty(matKhau))
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ tài khoản và mật khẩu!");
+                MessageBox.Show("Vui lòng nhập đủ thông tin!");
                 return;
             }
 
-            // 2. Kiểm tra trong Database (SQL)
-            if (KiemTraDangNhap(taiKhoan, matKhau))
-            {
-                // Lưu thông tin đăng nhập để lần sau tự điền (nếu user chọn)
-                try
-                {
-                    if (chkGhiNho.Checked)
-                    {
-                        Properties.Settings.Default.SavedUsername = taiKhoan;
-                        Properties.Settings.Default.SavedPassword = matKhau;
-                    }
-                    else
-                    {
-                        Properties.Settings.Default.SavedUsername = string.Empty;
-                        Properties.Settings.Default.SavedPassword = string.Empty;
-                    }
-                    Properties.Settings.Default.Save();
-                }
-                catch
-                {
-                    // ignore save errors
-                }
+            // 2. Gọi hàm kiểm tra Database
+            Account loginAccount = LayTaiKhoan(taiKhoan, matKhau);
 
-                // -- Mở Form Chính --
-                MessageBox.Show("Đăng nhập thành công!");
-                fSinhVien f = new fSinhVien(); // Mở form chính
+            if (loginAccount != null) // Đăng nhập thành công
+            {
+                // Xử lý Ghi nhớ mật khẩu (Đã sửa logic chuẩn)
+                if (chkGhiNho.Checked)
+                {
+                    Properties.Settings.Default.SavedUsername = taiKhoan;
+                    Properties.Settings.Default.SavedPassword = matKhau;
+                }
+                else
+                {
+                    // Nếu bỏ tích thì phải XÓA mật khẩu đã lưu đi
+                    Properties.Settings.Default.SavedUsername = "";
+                    Properties.Settings.Default.SavedPassword = "";
+                }
+                Properties.Settings.Default.Save(); // Lưu thay đổi
+
+                MessageBox.Show("Đăng nhập thành công! Xin chào " + loginAccount.DisplayName);
+
+                // --- QUAN TRỌNG: Truyền Account sang Form Chính ---
+                fSinhVien f = new fSinhVien(loginAccount);
+
                 this.Hide();
                 f.ShowDialog();
                 this.Show();
@@ -84,34 +82,42 @@ namespace ProjectQuanLySinhVien.GUI
             }
         }
 
-        // --- HÀM KIỂM TRA SQL ---
-        private bool KiemTraDangNhap(string tk, string mk)
+        // --- HÀM XỬ LÝ SQL ---
+        private Account LayTaiKhoan(string tk, string mk)
         {
             try
             {
-                conn = new SqlConnection(strKetNoi);
-                conn.Open();
+                string query = "SELECT * FROM ACCOUNT WHERE UserName = @user AND PassWord = @pass";
 
-                // Đếm xem có tài khoản nào khớp cả Tên và Pass không
-                string sql = "SELECT COUNT(*) FROM ACCOUNT WHERE UserName = @user AND PassWord = @pass";
-                SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@user", tk);
-                cmd.Parameters.AddWithValue("@pass", mk);
+                using (SqlConnection connection = new SqlConnection(strKetNoi))
+                {
+                    connection.Open();
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@user", tk);
+                    command.Parameters.AddWithValue("@pass", mk);
 
-                int kq = (int)cmd.ExecuteScalar(); // Trả về số lượng tìm thấy
+                    DataTable data = new DataTable();
+                    SqlDataAdapter adapter = new SqlDataAdapter(command);
+                    adapter.Fill(data);
 
-                return kq > 0; // Nếu > 0 là có tài khoản -> Đúng
+                    // Nếu tìm thấy tài khoản
+                    if (data.Rows.Count > 0)
+                    {
+                        return new Account(data.Rows[0]);
+                    }
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi kết nối: " + ex.Message);
-                return false;
             }
-            finally
-            {
-                if (conn != null && conn.State != System.Data.ConnectionState.Closed)
-                    conn.Close();
-            }
+            return null;
+        }
+
+        // Nút Thoát (Viết thêm cho đủ bộ nếu cần)
+        private void btnThoat_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
