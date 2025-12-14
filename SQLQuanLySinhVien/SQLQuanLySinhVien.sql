@@ -1,5 +1,4 @@
-﻿
-CREATE DATABASE QLSV_DB
+﻿CREATE DATABASE QLSV_DB
 GO
 
 USE QLSV_DB
@@ -28,13 +27,14 @@ CREATE TABLE LOP (
 )
 GO
 
--- 4. BẢNG SINH VIÊN
+-- 4. BẢNG SINH VIÊN (Cập nhật có ngày nhập học)
 CREATE TABLE SINHVIEN (
     MaSV NVARCHAR(20) PRIMARY KEY,
     HoTen NVARCHAR(100) NOT NULL,
     NgaySinh DATE,
     GioiTinh NVARCHAR(10),
     QueQuan NVARCHAR(200),
+    NgayNhapHoc DATE, -- Cột mới
     MaLop NVARCHAR(20) REFERENCES LOP(MaLop)
 )
 GO
@@ -58,7 +58,7 @@ CREATE TABLE ACCOUNT (
 GO
 
 ----------------------------------------------------------------------
--- NHẬP DỮ LIỆU MẪU 
+-- NHẬP DỮ LIỆU MẪU
 ----------------------------------------------------------------------
 
 -- KHOA
@@ -80,19 +80,20 @@ INSERT INTO MONHOC VALUES ('LTC', N'Lập trình C#', 3)
 INSERT INTO MONHOC VALUES ('CTRR', N'Cấu trúc rời rạc', 3)
 
 -- SINH VIÊN 
-INSERT INTO SINHVIEN VALUES ('SV001', N'Nguyễn Văn A', '1986-01-27', N'Nam', N'Tp.HCM', 'K11')
-INSERT INTO SINHVIEN VALUES ('SV002', N'Trần Ngọc Hân', '1986-03-14', N'Nữ', N'Kiên Giang', 'K11')
-INSERT INTO SINHVIEN VALUES ('SV003', N'Hà Duy Lập', '1986-04-18', N'Nam', N'Nghệ An', 'K11')
-INSERT INTO SINHVIEN VALUES ('SV004', N'Trần Ngọc Linh', '1986-03-30', N'Nữ', N'Tây Ninh', 'K12')
-INSERT INTO SINHVIEN VALUES ('SV005', N'Lê Nhật Minh', '1986-01-24', N'Nam', N'Tp.HCM', 'K12')
-INSERT INTO SINHVIEN VALUES ('SV006', N'Nguyễn Thị Kim Cúc', '1986-09-06', N'Nữ', N'Kiên Giang', 'K13')
+INSERT INTO SINHVIEN VALUES ('SV001', N'Nguyễn Văn A', '2003-01-27', N'Nam', N'Tp.HCM', '2023-09-05', 'K11')
+INSERT INTO SINHVIEN VALUES ('SV002', N'Trần Ngọc Hân', '2003-03-14', N'Nữ', N'Kiên Giang', '2023-09-05', 'K11')
+INSERT INTO SINHVIEN VALUES ('SV003', N'Hà Duy Lập', '2003-04-18', N'Nam', N'Nghệ An', '2023-09-05', 'K11')
+INSERT INTO SINHVIEN VALUES ('SV004', N'Trần Ngọc Linh', '2004-03-30', N'Nữ', N'Tây Ninh', '2024-09-05', 'K12')
+INSERT INTO SINHVIEN VALUES ('SV005', N'Lê Nhật Minh', '2004-01-24', N'Nam', N'Tp.HCM', '2024-09-05', 'K12')
+INSERT INTO SINHVIEN VALUES ('SV006', N'Nguyễn Thị Kim Cúc', '2005-09-06', N'Nữ', N'Kiên Giang', '2025-09-05', 'K13')
 
 -- KẾT QUẢ THI
 INSERT INTO KETQUA VALUES ('SV001', 'CSDL', 8.5)
 INSERT INTO KETQUA VALUES ('SV001', 'LTC', 9.0)
 INSERT INTO KETQUA VALUES ('SV002', 'CSDL', 5.0)
 INSERT INTO KETQUA VALUES ('SV003', 'THDC', 7.5)
-INSERT INTO KETQUA VALUES ('SV004', 'CTRR', 6.0) 
+INSERT INTO KETQUA VALUES ('SV004', 'CTRR', 6.0)
+
 -- TÀI KHOẢN (Pass: 1)
 INSERT INTO ACCOUNT VALUES ('admin', N'Quản trị viên', '1', 1)
 INSERT INTO ACCOUNT VALUES ('staff', N'Nhân viên', '1', 0)
