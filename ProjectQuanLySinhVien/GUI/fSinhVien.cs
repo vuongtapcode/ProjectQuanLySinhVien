@@ -286,11 +286,8 @@ namespace ProjectQuanLySinhVien.GUI
             btnXoa.Click += new EventHandler(btnXoa_Click);
             btnTaiLai.Click += new EventHandler(btnTaiLai_Click);
             dataGridView1.CellClick += new DataGridViewCellEventHandler(dataGridView1_CellClick);
-            quảnLýLớpToolStripMenuItem.Click += new EventHandler(quảnLýLớpToolStripMenuItem_Click);
-            quảnLýMônHọcToolStripMenuItem.Click += new EventHandler(quảnLýMônHọcToolStripMenuItem_Click);
             quảnLýKhoaToolStripMenuItem.Click += new EventHandler(quảnLýKhoaToolStripMenuItem_Click);
             quảnLýĐiểmToolStripMenuItem.Click += new EventHandler(quảnLýĐiểmToolStripMenuItem_Click);
-            quảnLýTàiKhoảnToolStripMenuItem.Click += new EventHandler(quảnLýTàiKhoảnToolStripMenuItem_Click);
         }
         private void label2_Click(object sender, EventArgs e)
         {
