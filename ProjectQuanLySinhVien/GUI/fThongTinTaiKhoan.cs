@@ -2,56 +2,51 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
-using ProjectQuanLySinhVien.DTO; // Nhớ dòng này
+using ProjectQuanLySinhVien.DTO; 
 
 namespace ProjectQuanLySinhVien.GUI
 {
     public partial class fThongTinTaiKhoan : Form
     {
-        private Account loginAccount; // Biến này đã chứa đủ thông tin (User, Pass, Name)
-
-        // Chuỗi kết nối
+        private Account loginAccount; 
         string strKetNoi = @"Data Source=DESKTOP-E2VL8VG\SQLEXPRESS;Initial Catalog=QLSV_DB;Integrated Security=True;TrustServerCertificate=True";
 
-        // Constructor mặc định cho Designer
         public fThongTinTaiKhoan()
         {
             InitializeComponent();
         }
 
-        // Constructor nhận Account (CHUẨN)
         public fThongTinTaiKhoan(Account acc)
         {
             InitializeComponent();
-            this.loginAccount = acc; // Nhận dữ liệu
-
+            this.loginAccount = acc; 
             LoadAccountInfo();
         }
 
         void LoadAccountInfo()
         {
-            // Hiển thị thông tin lên màn hình
-            // Lưu ý: Dùng loginAccount.UserName thay vì biến string rời rạc
             txbTenDangNhap.Text = loginAccount.UserName;
             txbTenHienThi.Text = loginAccount.DisplayName;
         }
 
-        // Sự kiện nút CẬP NHẬT
         private void btnCapNhat_Click(object sender, EventArgs e)
         {
             string tenHienThi = txbTenHienThi.Text;
-            string matKhauCu = txbMatKhauCu.Text; // Sửa tên biến cho rõ nghĩa
+            string matKhauCu = txbMatKhauCu.Text; 
             string matKhauMoi = txbMatKhauMoi.Text;
             string nhapLai = txbNhapLai.Text;
 
-            // 1. Kiểm tra nhập liệu
             if (string.IsNullOrEmpty(matKhauCu))
             {
                 MessageBox.Show("Vui lòng nhập mật khẩu hiện tại để xác nhận!");
                 return;
             }
-
-            // 2. Xử lý Logic Database
+            if (!matKhauMoi.Equals(nhapLai))
+            {
+                MessageBox.Show("Mật khẩu mới và nhập lại không khớp!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            // Xử lý Logic Database
             try
             {
                 // Dùng 'using' để tự động mở và đóng kết nối (Tránh lỗi Null Connection)
@@ -63,7 +58,7 @@ namespace ProjectQuanLySinhVien.GUI
                     string sqlCheck = "SELECT COUNT(*) FROM ACCOUNT WHERE UserName=@user AND PassWord=@pass";
                     SqlCommand cmdCheck = new SqlCommand(sqlCheck, connection);
 
-                    // QUAN TRỌNG: Lấy UserName từ loginAccount (Không dùng biến rỗng userNameHienTai nữa)
+                    // Lấy UserName từ loginAccount 
                     cmdCheck.Parameters.AddWithValue("@user", loginAccount.UserName);
                     cmdCheck.Parameters.AddWithValue("@pass", matKhauCu);
 
@@ -83,11 +78,7 @@ namespace ProjectQuanLySinhVien.GUI
                     // Trường hợp A: Có đổi mật khẩu mới
                     if (!string.IsNullOrEmpty(matKhauMoi))
                     {
-                        if (!matKhauMoi.Equals(nhapLai))
-                        {
-                            MessageBox.Show("Mật khẩu nhập lại không khớp!");
-                            return;
-                        }
+   
 
                         sqlUpdate = "UPDATE ACCOUNT SET DisplayName=@name, PassWord=@newPass WHERE UserName=@user";
                         cmdUpdate.Parameters.AddWithValue("@newPass", matKhauMoi);
@@ -113,7 +104,7 @@ namespace ProjectQuanLySinhVien.GUI
                         // (Tùy chọn) Cập nhật lại biến cục bộ để nếu chưa thoát form thì thấy ngay
                         loginAccount.DisplayName = tenHienThi;
                         this.DialogResult = DialogResult.OK;
-                        this.Close(); // Đóng form
+                        this.Close();
                     }
                     else
                     {

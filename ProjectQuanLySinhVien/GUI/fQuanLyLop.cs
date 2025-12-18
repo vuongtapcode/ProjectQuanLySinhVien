@@ -7,29 +7,25 @@ namespace ProjectQuanLySinhVien.GUI
 {
     public partial class fQuanLyLop : Form
     {
-        // 1. CHUỖI KẾT NỐI
         string strKetNoi = @"Data Source=DESKTOP-E2VL8VG\SQLEXPRESS;Initial Catalog=QLSV_DB;Integrated Security=True;TrustServerCertificate=True";
 
         public fQuanLyLop()
         {
             InitializeComponent();
-
-            // Tự động kích hoạt nút bấm
-            GanSuKien();
-
-            // Tải dữ liệu
             LoadComboBoxKhoa();
             LoadGrid();
+            PhanQuyen();
         }
-
-        private void GanSuKien()
+        void PhanQuyen()
         {
-            btnThem.Click += new EventHandler(btnThem_Click);
-            btnSua.Click += new EventHandler(btnSua_Click);
-            btnXoa.Click += new EventHandler(btnXoa_Click);
-            btnLamMoi.Click += new EventHandler(btnLamMoi_Click);
-            dataGridView1.CellClick += new DataGridViewCellEventHandler(dataGridView1_CellClick);
+            if (BienToanCuc.LoaiTaiKhoan == 0) // Là Nhân viên
+            {
+                btnThem.Enabled = false;
+                btnSua.Enabled = false;
+                btnXoa.Enabled = false;
+            }
         }
+        
 
         // ================= HÀM TẢI DANH SÁCH KHOA =================
         void LoadComboBoxKhoa()
@@ -79,15 +75,43 @@ namespace ProjectQuanLySinhVien.GUI
         // ================= NÚT THÊM =================
         private void btnThem_Click(object sender, EventArgs e)
         {
-            if (txbMaLop.Text.Trim() == "" || txbTenLop.Text.Trim() == "")
+            // --- KIỂM TRA ĐẦU VÀO ---
+            string maLop = txbMaLop.Text.Trim();
+            string tenLop = txbTenLop.Text.Trim();
+
+            // 1. Kiểm tra thiếu cả hai
+            if (string.IsNullOrEmpty(maLop) && string.IsNullOrEmpty(tenLop))
             {
-                MessageBox.Show("Vui lòng nhập Mã lớp và Tên lớp!"); return;
-            }
-            if (cboKhoa.SelectedValue == null)
-            {
-                MessageBox.Show("Vui lòng chọn Khoa!"); return;
+                MessageBox.Show("Vui lòng nhập Mã lớp và Tên lớp!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txbMaLop.Focus();
+                return;
             }
 
+            // 2. Kiểm tra chỉ thiếu Mã lớp
+            if (string.IsNullOrEmpty(maLop))
+            {
+                MessageBox.Show("Vui lòng nhập Mã lớp!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txbMaLop.Focus();
+                return;
+            }
+
+            // 3. Kiểm tra chỉ thiếu Tên lớp
+            if (string.IsNullOrEmpty(tenLop))
+            {
+                MessageBox.Show("Vui lòng nhập Tên lớp!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txbTenLop.Focus();
+                return;
+            }
+
+            // 4. Kiểm tra chọn Khoa
+            if (cboKhoa.SelectedValue == null)
+            {
+                MessageBox.Show("Vui lòng chọn Khoa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cboKhoa.Focus();
+                return;
+            }
+
+            // --- PHẦN XỬ LÝ SQL ---
             using (SqlConnection conn = new SqlConnection(strKetNoi))
             {
                 try
@@ -97,22 +121,26 @@ namespace ProjectQuanLySinhVien.GUI
                     // Check trùng
                     string checkSQL = "SELECT COUNT(*) FROM LOP WHERE MaLop = @ma";
                     SqlCommand cmdCheck = new SqlCommand(checkSQL, conn);
-                    cmdCheck.Parameters.AddWithValue("@ma", txbMaLop.Text.Trim());
+                    cmdCheck.Parameters.AddWithValue("@ma", maLop);
 
                     if ((int)cmdCheck.ExecuteScalar() > 0)
                     {
-                        MessageBox.Show("Mã lớp này đã tồn tại!"); return;
+                        MessageBox.Show("Mã lớp [" + maLop + "] đã tồn tại trong hệ thống!", "Lỗi trùng lặp", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        txbMaLop.Focus();
+                        txbMaLop.SelectAll();
+                        return;
                     }
 
                     // Thêm
                     string sql = "INSERT INTO LOP (MaLop, TenLop, MaKhoa) VALUES (@ma, @ten, @makhoa)";
                     SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.AddWithValue("@ma", txbMaLop.Text.Trim());
-                    cmd.Parameters.AddWithValue("@ten", txbTenLop.Text.Trim());
+                    cmd.Parameters.AddWithValue("@ma", maLop);
+                    cmd.Parameters.AddWithValue("@ten", tenLop);
                     cmd.Parameters.AddWithValue("@makhoa", cboKhoa.SelectedValue.ToString());
 
                     cmd.ExecuteNonQuery();
-                    MessageBox.Show("Thêm thành công!");
+                    MessageBox.Show("Thêm lớp mới thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                     LoadGrid();
                     LamMoi();
                 }
@@ -123,7 +151,7 @@ namespace ProjectQuanLySinhVien.GUI
             }
         }
 
-        // ================= NÚT SỬA (Đã Fix logic kiểm tra) =================
+        // ================= NÚT SỬA  =================
         private void btnSua_Click(object sender, EventArgs e)
         {
             if (txbMaLop.Text == "") return;
@@ -159,13 +187,11 @@ namespace ProjectQuanLySinhVien.GUI
             }
         }
 
-        // ================= NÚT XÓA (Đã Fix logic kiểm tra) =================
-        // ================= NÚT XÓA (Phiên bản thân thiện: Kiểm tra trước khi xóa) =================
+        
+        // ================= NÚT XÓA  =================
         private void btnXoa_Click(object sender, EventArgs e)
         {
             if (txbMaLop.Text == "") return;
-
-            // Hỏi xác nhận trước cho chắc ăn
             if (MessageBox.Show("Bạn có chắc muốn xóa lớp [" + txbMaLop.Text + "] không?",
                 "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
             {
@@ -187,7 +213,7 @@ namespace ProjectQuanLySinhVien.GUI
 
                     if (soLuongSinhVien > 0)
                     {
-                        // Nếu có sinh viên thì báo lỗi dễ hiểu và DỪNG LẠI NGAY
+                        // Nếu có sinh viên thì báo lỗi và DỪNG LẠI NGAY
                         MessageBox.Show("Không thể xóa lớp này!\n\nLý do: Lớp [" + txbMaLop.Text + "] đang có " + soLuongSinhVien + " sinh viên theo học.\n\nHãy xóa hoặc chuyển lớp cho các sinh viên này trước.",
                                         "Cảnh báo ràng buộc", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
@@ -213,7 +239,7 @@ namespace ProjectQuanLySinhVien.GUI
                 }
                 catch (Exception ex)
                 {
-                    // Lỗi khác (ví dụ mất mạng, lỗi server...)
+                  
                     MessageBox.Show("Lỗi hệ thống: " + ex.Message);
                 }
             }
@@ -236,17 +262,30 @@ namespace ProjectQuanLySinhVien.GUI
         // ================= CLICK BẢNG =================
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+            // 1. Chặn click vào dòng tiêu đề (-1) hoặc dòng trống cuối cùng
+            if (e.RowIndex < 0 || e.RowIndex == dataGridView1.NewRowIndex) return;
+
+            try
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-                txbMaLop.Text = row.Cells["MaLop"].Value.ToString();
-                txbTenLop.Text = row.Cells["TenLop"].Value.ToString();
+                txbMaLop.Text = row.Cells[0].Value.ToString();
+                txbTenLop.Text = row.Cells[1].Value.ToString();
 
-                string maKhoa = row.Cells["MaKhoa"].Value.ToString();
-                cboKhoa.SelectedValue = maKhoa;
+                // 3. Xử lý ComboBox Khoa (Kiểm tra null cho an toàn)
+                if (row.Cells[2].Value != null && row.Cells[2].Value != DBNull.Value)
+                {
+                    string maKhoa = row.Cells[2].Value.ToString();
+                    cboKhoa.SelectedValue = maKhoa;
+                }
 
                 txbMaLop.Enabled = false;
             }
+            catch (Exception)
+            {
+                
+            }
         }
+
+       
     }
 }

@@ -183,7 +183,7 @@
             this.label1.Size = new System.Drawing.Size(179, 32);
             this.label1.TabIndex = 2;
             this.label1.Text = "Tên đăng nhập:";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            
             // 
             // txbTenDangNhap
             // 
@@ -229,6 +229,7 @@
             this.btnLamMoi.TabIndex = 8;
             this.btnLamMoi.Text = "LÀM MỚI";
             this.btnLamMoi.UseVisualStyleBackColor = false;
+            this.btnLamMoi.Click += new System.EventHandler(this.btnLamMoi_Click);
             // 
             // btnXoa
             // 
@@ -242,9 +243,10 @@
             this.btnXoa.Location = new System.Drawing.Point(495, 190);
             this.btnXoa.Name = "btnXoa";
             this.btnXoa.Size = new System.Drawing.Size(116, 39);
-            this.btnXoa.TabIndex = 7;
+            this.btnXoa.TabIndex = 6;
             this.btnXoa.Text = "XÓA";
             this.btnXoa.UseVisualStyleBackColor = false;
+            this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
             // 
             // btnSua
             // 
@@ -258,9 +260,10 @@
             this.btnSua.Location = new System.Drawing.Point(628, 190);
             this.btnSua.Name = "btnSua";
             this.btnSua.Size = new System.Drawing.Size(113, 39);
-            this.btnSua.TabIndex = 6;
+            this.btnSua.TabIndex = 7;
             this.btnSua.Text = "SỬA";
             this.btnSua.UseVisualStyleBackColor = false;
+            this.btnSua.Click += new System.EventHandler(this.btnSua_Click);
             // 
             // btnThem
             // 
@@ -277,10 +280,13 @@
             this.btnThem.TabIndex = 5;
             this.btnThem.Text = "THÊM";
             this.btnThem.UseVisualStyleBackColor = false;
+            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
             // 
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToResizeColumns = false;
+            this.dataGridView1.AllowUserToResizeRows = false;
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.BackgroundColor = System.Drawing.Color.White;
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -322,6 +328,7 @@
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(888, 510);
             this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             // 
             // Column1
             // 

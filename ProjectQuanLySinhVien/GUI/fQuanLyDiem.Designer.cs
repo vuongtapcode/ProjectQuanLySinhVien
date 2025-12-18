@@ -14,8 +14,8 @@
 
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panelTop = new System.Windows.Forms.Panel();
             this.btnLamMoi = new System.Windows.Forms.Button();
             this.btnSua = new System.Windows.Forms.Button();
@@ -68,7 +68,7 @@
             this.btnLamMoi.Location = new System.Drawing.Point(880, 168);
             this.btnLamMoi.Name = "btnLamMoi";
             this.btnLamMoi.Size = new System.Drawing.Size(100, 39);
-            this.btnLamMoi.TabIndex = 11;
+            this.btnLamMoi.TabIndex = 9;
             this.btnLamMoi.Text = "LÀM MỚI";
             this.btnLamMoi.UseVisualStyleBackColor = false;
             this.btnLamMoi.Click += new System.EventHandler(this.btnLamMoi_Click);
@@ -85,7 +85,7 @@
             this.btnSua.Location = new System.Drawing.Point(640, 168);
             this.btnSua.Name = "btnSua";
             this.btnSua.Size = new System.Drawing.Size(113, 39);
-            this.btnSua.TabIndex = 9;
+            this.btnSua.TabIndex = 7;
             this.btnSua.Text = "SỬA";
             this.btnSua.UseVisualStyleBackColor = false;
             this.btnSua.Click += new System.EventHandler(this.btnSua_Click);
@@ -102,7 +102,7 @@
             this.btnThem.Location = new System.Drawing.Point(520, 168);
             this.btnThem.Name = "btnThem";
             this.btnThem.Size = new System.Drawing.Size(113, 39);
-            this.btnThem.TabIndex = 8;
+            this.btnThem.TabIndex = 6;
             this.btnThem.Text = "THÊM";
             this.btnThem.UseVisualStyleBackColor = false;
             this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
@@ -135,7 +135,7 @@
             this.cboMonHoc.Location = new System.Drawing.Point(550, 37);
             this.cboMonHoc.Name = "cboMonHoc";
             this.cboMonHoc.Size = new System.Drawing.Size(250, 39);
-            this.cboMonHoc.TabIndex = 0;
+            this.cboMonHoc.TabIndex = 2;
             this.cboMonHoc.SelectedIndexChanged += new System.EventHandler(this.cboMonHoc_SelectedIndexChanged);
             // 
             // label4
@@ -155,7 +155,7 @@
             this.cboLop.Location = new System.Drawing.Point(120, 37);
             this.cboLop.Name = "cboLop";
             this.cboLop.Size = new System.Drawing.Size(250, 39);
-            this.cboLop.TabIndex = 2;
+            this.cboLop.TabIndex = 1;
             this.cboLop.SelectedIndexChanged += new System.EventHandler(this.cboLop_SelectedIndexChanged);
             // 
             // label3
@@ -175,7 +175,7 @@
             this.txtDiem.Location = new System.Drawing.Point(710, 87);
             this.txtDiem.Name = "txtDiem";
             this.txtDiem.Size = new System.Drawing.Size(100, 42);
-            this.txtDiem.TabIndex = 4;
+            this.txtDiem.TabIndex = 5;
             this.txtDiem.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
@@ -198,7 +198,7 @@
             this.txtMaSV.Name = "txtMaSV";
             this.txtMaSV.ReadOnly = true;
             this.txtMaSV.Size = new System.Drawing.Size(100, 39);
-            this.txtMaSV.TabIndex = 6;
+            this.txtMaSV.TabIndex = 3;
             // 
             // txtTenSV
             // 
@@ -209,7 +209,7 @@
             this.txtTenSV.Name = "txtTenSV";
             this.txtTenSV.ReadOnly = true;
             this.txtTenSV.Size = new System.Drawing.Size(300, 39);
-            this.txtTenSV.TabIndex = 7;
+            this.txtTenSV.TabIndex = 4;
             // 
             // label1
             // 
@@ -238,22 +238,26 @@
             this.btnXoa.Location = new System.Drawing.Point(760, 168);
             this.btnXoa.Name = "btnXoa";
             this.btnXoa.Size = new System.Drawing.Size(113, 39);
-            this.btnXoa.TabIndex = 2;
+            this.btnXoa.TabIndex = 8;
             this.btnXoa.Text = "XÓA ĐIỂM";
             this.btnXoa.UseVisualStyleBackColor = false;
             this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToResizeColumns = false;
+            this.dataGridView1.AllowUserToResizeRows = false;
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.BackgroundColor = System.Drawing.Color.White;
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 10F);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Segoe UI", 10F);
+            dataGridViewCellStyle7.ForeColor = System.Drawing.Color.White;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.dataGridView1.ColumnHeadersHeight = 45;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colMaSV,
             this.colTenSV,
@@ -263,6 +267,7 @@
             this.dataGridView1.Location = new System.Drawing.Point(0, 220);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowHeadersWidth = 72;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(1000, 380);
@@ -294,8 +299,8 @@
             // colDiem
             // 
             this.colDiem.DataPropertyName = "DiemSo";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.colDiem.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.colDiem.DefaultCellStyle = dataGridViewCellStyle8;
             this.colDiem.FillWeight = 41.56626F;
             this.colDiem.HeaderText = "ĐIỂM SỐ";
             this.colDiem.MinimumWidth = 9;

@@ -18,6 +18,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cboKhoa = new System.Windows.Forms.ComboBox();
             this.lbKhoa = new System.Windows.Forms.Label();
             this.txbTenLop = new System.Windows.Forms.TextBox();
             this.lbTenLop = new System.Windows.Forms.Label();
@@ -28,10 +29,9 @@
             this.btnSua = new System.Windows.Forms.Button();
             this.btnThem = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.colMaKhoa = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colTenLop = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colMaLop = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cboKhoa = new System.Windows.Forms.ComboBox();
+            this.colTenLop = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMaKhoa = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -82,6 +82,17 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "THÔNG TIN LỚP HỌC";
+            // 
+            // cboKhoa
+            // 
+            this.cboKhoa.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cboKhoa.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboKhoa.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cboKhoa.FormattingEnabled = true;
+            this.cboKhoa.Location = new System.Drawing.Point(710, 42);
+            this.cboKhoa.Name = "cboKhoa";
+            this.cboKhoa.Size = new System.Drawing.Size(240, 39);
+            this.cboKhoa.TabIndex = 3;
             // 
             // lbKhoa
             // 
@@ -149,6 +160,7 @@
             this.btnLamMoi.TabIndex = 7;
             this.btnLamMoi.Text = "LÀM MỚI";
             this.btnLamMoi.UseVisualStyleBackColor = false;
+            this.btnLamMoi.Click += new System.EventHandler(this.btnLamMoi_Click);
             // 
             // btnXoa
             // 
@@ -162,9 +174,10 @@
             this.btnXoa.Location = new System.Drawing.Point(599, 145);
             this.btnXoa.Name = "btnXoa";
             this.btnXoa.Size = new System.Drawing.Size(116, 39);
-            this.btnXoa.TabIndex = 6;
+            this.btnXoa.TabIndex = 5;
             this.btnXoa.Text = "XÓA";
             this.btnXoa.UseVisualStyleBackColor = false;
+            this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
             // 
             // btnSua
             // 
@@ -178,9 +191,10 @@
             this.btnSua.Location = new System.Drawing.Point(732, 145);
             this.btnSua.Name = "btnSua";
             this.btnSua.Size = new System.Drawing.Size(113, 39);
-            this.btnSua.TabIndex = 5;
+            this.btnSua.TabIndex = 6;
             this.btnSua.Text = "SỬA";
             this.btnSua.UseVisualStyleBackColor = false;
+            this.btnSua.Click += new System.EventHandler(this.btnSua_Click);
             // 
             // btnThem
             // 
@@ -197,10 +211,13 @@
             this.btnThem.TabIndex = 4;
             this.btnThem.Text = "THÊM";
             this.btnThem.UseVisualStyleBackColor = false;
+            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
             // 
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToResizeColumns = false;
+            this.dataGridView1.AllowUserToResizeRows = false;
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.BackgroundColor = System.Drawing.Color.White;
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -239,22 +256,8 @@
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(1000, 396);
             this.dataGridView1.TabIndex = 0;
-            // 
-            // colMaKhoa
-            // 
-            this.colMaKhoa.DataPropertyName = "MaKhoa";
-            this.colMaKhoa.HeaderText = "MÃ KHOA";
-            this.colMaKhoa.MinimumWidth = 9;
-            this.colMaKhoa.Name = "colMaKhoa";
-            this.colMaKhoa.ReadOnly = true;
-            // 
-            // colTenLop
-            // 
-            this.colTenLop.DataPropertyName = "TenLop";
-            this.colTenLop.HeaderText = "TÊN LỚP";
-            this.colTenLop.MinimumWidth = 9;
-            this.colTenLop.Name = "colTenLop";
-            this.colTenLop.ReadOnly = true;
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
+            
             // 
             // colMaLop
             // 
@@ -264,16 +267,21 @@
             this.colMaLop.Name = "colMaLop";
             this.colMaLop.ReadOnly = true;
             // 
-            // cboKhoa
+            // colTenLop
             // 
-            this.cboKhoa.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cboKhoa.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboKhoa.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.cboKhoa.FormattingEnabled = true;
-            this.cboKhoa.Location = new System.Drawing.Point(710, 42);
-            this.cboKhoa.Name = "cboKhoa";
-            this.cboKhoa.Size = new System.Drawing.Size(240, 39);
-            this.cboKhoa.TabIndex = 3;
+            this.colTenLop.DataPropertyName = "TenLop";
+            this.colTenLop.HeaderText = "TÊN LỚP";
+            this.colTenLop.MinimumWidth = 9;
+            this.colTenLop.Name = "colTenLop";
+            this.colTenLop.ReadOnly = true;
+            // 
+            // colMaKhoa
+            // 
+            this.colMaKhoa.DataPropertyName = "MaKhoa";
+            this.colMaKhoa.HeaderText = "MÃ KHOA";
+            this.colMaKhoa.MinimumWidth = 9;
+            this.colMaKhoa.Name = "colMaKhoa";
+            this.colMaKhoa.ReadOnly = true;
             // 
             // fQuanLyLop
             // 

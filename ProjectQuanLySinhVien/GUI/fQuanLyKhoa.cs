@@ -15,19 +15,8 @@ namespace ProjectQuanLySinhVien.GUI
         {
             InitializeComponent();
             LoadData();
-            GanSuKien(); 
+           
         }
-
-        
-        private void GanSuKien()
-        {
-            btnThem.Click += new EventHandler(btnThem_Click);
-            btnSua.Click += new EventHandler(btnSua_Click);
-            btnXoa.Click += new EventHandler(btnXoa_Click);
-            btnLamMoi.Click += new EventHandler(btnLamMoi_Click);
-            dataGridView1.CellClick += new DataGridViewCellEventHandler(dataGridView1_CellClick);
-        }
-
         private void LoadData()
         {
             try
@@ -83,42 +72,62 @@ namespace ProjectQuanLySinhVien.GUI
 
         private void btnThem_Click(object sender, EventArgs e)
         {
-            if (txtMaKhoa.Text == "") { MessageBox.Show("Vui lòng nhập Mã Khoa!"); return; }
+            // --- 1. KIỂM TRA DỮ LIỆU ĐẦU VÀO  ---
 
-            string ma = txtMaKhoa.Text.Trim();
-            if (KiemTraMaKhoaTonTai(ma))
+            // Kiểm tra Mã Khoa
+            if (string.IsNullOrWhiteSpace(txtMaKhoa.Text))
             {
-                MessageBox.Show("Mã khoa đã tồn tại. Vui lòng nhập mã khác.", "Trùng mã", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Vui lòng nhập Mã Khoa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtMaKhoa.Focus();
                 return;
             }
 
+            // Kiểm tra Tên Khoa
+            if (string.IsNullOrWhiteSpace(txtTenKhoa.Text))
+            {
+                MessageBox.Show("Vui lòng nhập Tên Khoa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTenKhoa.Focus(); 
+                return;
+            }
+
+            // --- 2. KIỂM TRA TRÙNG MÃ ---
+            string ma = txtMaKhoa.Text.Trim();
+            if (KiemTraMaKhoaTonTai(ma))
+            {
+                MessageBox.Show("Mã khoa [" + ma + "] đã tồn tại.\nVui lòng nhập mã khác.", "Trùng mã", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtMaKhoa.Focus();
+                txtMaKhoa.SelectAll();
+                return;
+            }
+
+            // --- 3. THỰC HIỆN INSERT ---
             try
             {
                 if (conn == null) conn = new SqlConnection(strKetNoi);
                 if (conn.State == ConnectionState.Closed) conn.Open();
+
                 string sql = "INSERT INTO KHOA (MaKhoa, TenKhoa) VALUES (@ma, @ten)";
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@ma", ma);
                 cmd.Parameters.AddWithValue("@ten", txtTenKhoa.Text.Trim());
+
                 cmd.ExecuteNonQuery();
-                MessageBox.Show("Thêm thành công!");
+
+                MessageBox.Show("Thêm khoa thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 LoadData();
                 ResetForm();
             }
             catch (SqlException ex)
             {
-                // Sql error codes 2627 and 2601 indicate unique constraint / PK violation
                 if (ex.Number == 2627 || ex.Number == 2601)
-                {
-                    MessageBox.Show("Không thể thêm: Mã khoa đã tồn tại (khóa chính trùng). Vui lòng nhập mã khác.", "Lỗi trùng khóa", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                    MessageBox.Show("Lỗi: Mã khoa bị trùng trong CSDL!", "Lỗi trùng khóa", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
-                {
                     MessageBox.Show("Lỗi SQL: " + ex.Message);
-                }
             }
-            catch (Exception ex) { MessageBox.Show("Lỗi: " + ex.Message); }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message);
+            }
             finally
             {
                 if (conn != null && conn.State == ConnectionState.Open) conn.Close();
@@ -127,20 +136,48 @@ namespace ProjectQuanLySinhVien.GUI
 
         private void btnSua_Click(object sender, EventArgs e)
         {
+            // Kiểm tra nếu chưa chọn Mã Khoa
+            if (string.IsNullOrWhiteSpace(txtMaKhoa.Text))
+            {
+                MessageBox.Show("Vui lòng chọn Khoa cần sửa từ danh sách!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Kiểm tra Tên Khoa có bị bỏ trống khi sửa không
+            if (string.IsNullOrWhiteSpace(txtTenKhoa.Text))
+            {
+                MessageBox.Show("Tên Khoa không được để trống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTenKhoa.Focus();
+                return;
+            }
+
             try
             {
                 if (conn == null) conn = new SqlConnection(strKetNoi);
                 if (conn.State == ConnectionState.Closed) conn.Open();
+
                 string sql = "UPDATE KHOA SET TenKhoa=@ten WHERE MaKhoa=@ma";
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@ma", txtMaKhoa.Text.Trim());
                 cmd.Parameters.AddWithValue("@ten", txtTenKhoa.Text.Trim());
-                cmd.ExecuteNonQuery();
-                MessageBox.Show("Sửa thành công!");
-                LoadData();
-                ResetForm();
+
+                int rows = cmd.ExecuteNonQuery();
+
+                if (rows > 0)
+                {
+                    MessageBox.Show("Cập nhật thông tin Khoa thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadData();
+                    ResetForm();
+                }
+                else
+                {
+                    MessageBox.Show("Không tìm thấy Mã Khoa để sửa (Có thể đã bị xóa).", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            catch (Exception ex) { MessageBox.Show("Lỗi: " + ex.Message); }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi cập nhật: " + ex.Message);
+            }
             finally
             {
                 if (conn != null && conn.State == ConnectionState.Open) conn.Close();
@@ -182,5 +219,7 @@ namespace ProjectQuanLySinhVien.GUI
             txtMaKhoa.Enabled = true;
             txtMaKhoa.Focus();
         }
+
+        
     }
 }

@@ -7,30 +7,25 @@ namespace ProjectQuanLySinhVien.GUI
 {
     public partial class fQuanLyMonHoc : Form
     {
-        // 1. Chuỗi kết nối chuẩn
         string strKetNoi = @"Data Source=DESKTOP-E2VL8VG\SQLEXPRESS;Initial Catalog=QLSV_DB;Integrated Security=True;TrustServerCertificate=True";
 
         public fQuanLyMonHoc()
         {
             InitializeComponent();
-
-            // --- QUAN TRỌNG: GỌI HÀM NÀY ĐỂ TỰ ĐỘNG NỐI SỰ KIỆN CHO NÚT BẤM ---
-            // (Giúp bạn không cần chỉnh trong Designer nữa)
-            GanSuKien();
-
-            // Tải dữ liệu lên bảng ngay khi mở form
             LoadGrid();
+            PhanQuyen();
         }
-
-        // Hàm này sẽ tự động bắt sự kiện Click cho các nút
-        private void GanSuKien()
+        void PhanQuyen()
         {
-            btnThem.Click += new EventHandler(btnThem_Click);
-            btnSua.Click += new EventHandler(btnSua_Click);
-            btnXoa.Click += new EventHandler(btnXoa_Click);
-            btnLamMoi.Click += new EventHandler(btnLamMoi_Click);
-            dataGridView1.CellClick += new DataGridViewCellEventHandler(dataGridView1_CellClick);
+            if (BienToanCuc.LoaiTaiKhoan == 0)
+            {
+                btnThem.Enabled = false;
+                btnSua.Enabled = false;
+                btnXoa.Enabled = false;
+            }
         }
+        
+        
 
         // ================= LOAD GRID (Tải dữ liệu) =================
         private void LoadGrid()
@@ -101,8 +96,22 @@ namespace ProjectQuanLySinhVien.GUI
         // ================= SỬA (UPDATE) =================
         private void btnSua_Click(object sender, EventArgs e)
         {
-            if (txtMaMon.Text.Trim() == "") return;
+            // 1. Kiểm tra xem đã chọn/nhập Mã môn chưa
+            if (string.IsNullOrWhiteSpace(txtMaMon.Text))
+            {
+                MessageBox.Show("Vui lòng chọn môn học cần sửa!", "Thông báo");
+                return;
+            }
 
+            // 2. Kiểm tra Tên môn có bị bỏ trống không
+            if (string.IsNullOrWhiteSpace(txtTenMon.Text))
+            {
+                MessageBox.Show("Tên môn học không được để trống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTenMon.Focus(); // Đưa con trỏ chuột về ô Tên môn để nhập lại
+                return;
+            }
+
+            // 3. Thực hiện Update
             using (SqlConnection conn = new SqlConnection(strKetNoi))
             {
                 try
@@ -110,24 +119,27 @@ namespace ProjectQuanLySinhVien.GUI
                     conn.Open();
                     string query = "UPDATE MONHOC SET TenMH = @TenMH, SoTinChi = @SoTinChi WHERE MaMH = @MaMH";
                     SqlCommand cmd = new SqlCommand(query, conn);
+
                     cmd.Parameters.AddWithValue("@MaMH", txtMaMon.Text.Trim());
                     cmd.Parameters.AddWithValue("@TenMH", txtTenMon.Text.Trim());
                     cmd.Parameters.AddWithValue("@SoTinChi", nmrSoTinChi.Value);
 
-                    if (cmd.ExecuteNonQuery() > 0)
+                    // Kiểm tra xem có dòng nào được cập nhật không
+                    int rows = cmd.ExecuteNonQuery();
+                    if (rows > 0)
                     {
-                        MessageBox.Show("Cập nhật thành công!");
-                        LoadGrid();
-                        LamMoi();
+                        MessageBox.Show("Cập nhật thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LoadGrid(); // Tải lại bảng
+                        LamMoi();   // Xóa trắng ô nhập
                     }
                     else
                     {
-                        MessageBox.Show("Không tìm thấy mã môn để sửa!");
+                        MessageBox.Show("Không tìm thấy Mã môn học [" + txtMaMon.Text + "] để sửa.\n(Có thể mã này đã bị xóa bởi người khác).", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Lỗi sửa: " + ex.Message);
+                    MessageBox.Show("Lỗi sửa dữ liệu: " + ex.Message);
                 }
             }
         }
@@ -177,25 +189,38 @@ namespace ProjectQuanLySinhVien.GUI
             txtMaMon.Clear();
             txtTenMon.Clear();
             nmrSoTinChi.Value = 3;
-            txtMaMon.Enabled = true; // Cho phép nhập lại mã
+            txtMaMon.Enabled = true; 
         }
 
         // ================= CLICK VÀO BẢNG =================
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex < 0) return;
+            if (e.RowIndex < 0 || e.RowIndex == dataGridView1.NewRowIndex) return;
 
-            DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+            try
+            {
+                DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+                txtMaMon.Text = row.Cells[0].Value.ToString();
+                txtTenMon.Text = row.Cells[1].Value.ToString();
 
-            txtMaMon.Text = row.Cells["MaMH"].Value.ToString();
-            txtTenMon.Text = row.Cells["TenMH"].Value.ToString();
+                // Xử lý số tín chỉ 
+                if (row.Cells[2].Value != DBNull.Value && row.Cells[2].Value != null)
+                {
+                    nmrSoTinChi.Value = Convert.ToDecimal(row.Cells[2].Value);
+                }
+                else
+                {
+                    nmrSoTinChi.Value = 0;
+                }
 
-            if (row.Cells["SoTinChi"].Value != DBNull.Value)
-                nmrSoTinChi.Value = Convert.ToDecimal(row.Cells["SoTinChi"].Value);
-            else
-                nmrSoTinChi.Value = 0;
-
-            txtMaMon.Enabled = false; // Khóa mã lại
+                txtMaMon.Enabled = false; 
+            }
+            catch (Exception)
+            {
+                
+            }
         }
+
+        
     }
 }

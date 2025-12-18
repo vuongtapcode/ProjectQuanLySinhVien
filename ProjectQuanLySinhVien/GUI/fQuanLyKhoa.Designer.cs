@@ -117,7 +117,6 @@
             this.lbMaKhoa.Size = new System.Drawing.Size(112, 32);
             this.lbMaKhoa.TabIndex = 0;
             this.lbMaKhoa.Text = "Mã khoa:";
-            //this.lbMaKhoa.Click += new System.EventHandler(this.lbMaKhoa_Click);
             // 
             // btnLamMoi
             // 
@@ -129,9 +128,10 @@
             this.btnLamMoi.Location = new System.Drawing.Point(860, 145);
             this.btnLamMoi.Name = "btnLamMoi";
             this.btnLamMoi.Size = new System.Drawing.Size(120, 39);
-            this.btnLamMoi.TabIndex = 7;
+            this.btnLamMoi.TabIndex = 6;
             this.btnLamMoi.Text = "LÀM MỚI";
             this.btnLamMoi.UseVisualStyleBackColor = false;
+            this.btnLamMoi.Click += new System.EventHandler(this.btnLamMoi_Click);
             // 
             // btnXoa
             // 
@@ -143,9 +143,10 @@
             this.btnXoa.Location = new System.Drawing.Point(599, 145);
             this.btnXoa.Name = "btnXoa";
             this.btnXoa.Size = new System.Drawing.Size(116, 39);
-            this.btnXoa.TabIndex = 6;
+            this.btnXoa.TabIndex = 4;
             this.btnXoa.Text = "XÓA";
             this.btnXoa.UseVisualStyleBackColor = false;
+            this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
             // 
             // btnSua
             // 
@@ -160,6 +161,7 @@
             this.btnSua.TabIndex = 5;
             this.btnSua.Text = "SỬA";
             this.btnSua.UseVisualStyleBackColor = false;
+            this.btnSua.Click += new System.EventHandler(this.btnSua_Click);
             // 
             // btnThem
             // 
@@ -171,13 +173,16 @@
             this.btnThem.Location = new System.Drawing.Point(470, 145);
             this.btnThem.Name = "btnThem";
             this.btnThem.Size = new System.Drawing.Size(113, 39);
-            this.btnThem.TabIndex = 4;
+            this.btnThem.TabIndex = 3;
             this.btnThem.Text = "THÊM";
             this.btnThem.UseVisualStyleBackColor = false;
+            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
             // 
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToResizeColumns = false;
+            this.dataGridView1.AllowUserToResizeRows = false;
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.BackgroundColor = System.Drawing.Color.White;
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -214,7 +219,8 @@
             this.dataGridView1.RowTemplate.Height = 35;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(1000, 396);
-            this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.TabIndex = 7;
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             // 
             // colMaKhoa
             // 

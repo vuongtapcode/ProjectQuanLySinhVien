@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GUI\Account.cs" />
+    <Compile Include="GUI\BienToanCuc.cs" />
     <Compile Include="GUI\fDangNhap.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -118,6 +119,9 @@
     <EmbeddedResource Include="GUI\fSinhVien.resx">
       <DependentUpon>fSinhVien.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\fThongTinTaiKhoan.resx">
+      <DependentUpon>fThongTinTaiKhoan.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -140,9 +144,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="BLL\" />
-    <Folder Include="DAL\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

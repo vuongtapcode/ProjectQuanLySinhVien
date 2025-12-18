@@ -2,13 +2,12 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows.Forms;
-using ProjectQuanLySinhVien.DTO; // Nhớ dòng này
+using ProjectQuanLySinhVien.DTO; 
 
 namespace ProjectQuanLySinhVien.GUI
 {
     public partial class fDangNhap : Form
     {
-        // Chuỗi kết nối
         string strKetNoi = @"Data Source=DESKTOP-E2VL8VG\SQLEXPRESS;Initial Catalog=QLSV_DB;Integrated Security=True";
 
         public fDangNhap()
@@ -31,7 +30,7 @@ namespace ProjectQuanLySinhVien.GUI
             }
             catch
             {
-                // Bỏ qua lỗi nếu chưa có Setting
+                
             }
         }
 
@@ -41,19 +40,18 @@ namespace ProjectQuanLySinhVien.GUI
             string taiKhoan = txbTaiKhoan.Text;
             string matKhau = txbMatKhau.Text;
 
-            // 1. Kiểm tra rỗng
             if (string.IsNullOrEmpty(taiKhoan) || string.IsNullOrEmpty(matKhau))
             {
-                MessageBox.Show("Vui lòng nhập đủ thông tin!");
-                return;
+                MessageBox.Show("Vui lòng nhập đủ thông tin!"); return;
             }
 
-            // 2. Gọi hàm kiểm tra Database
             Account loginAccount = LayTaiKhoan(taiKhoan, matKhau);
 
             if (loginAccount != null) // Đăng nhập thành công
             {
-                // Xử lý Ghi nhớ mật khẩu (Đã sửa logic chuẩn)
+                BienToanCuc.LoaiTaiKhoan = loginAccount.Type;
+
+                // Xử lý ghi nhớ mật khẩu
                 if (chkGhiNho.Checked)
                 {
                     Properties.Settings.Default.SavedUsername = taiKhoan;
@@ -61,17 +59,14 @@ namespace ProjectQuanLySinhVien.GUI
                 }
                 else
                 {
-                    // Nếu bỏ tích thì phải XÓA mật khẩu đã lưu đi
                     Properties.Settings.Default.SavedUsername = "";
                     Properties.Settings.Default.SavedPassword = "";
                 }
-                Properties.Settings.Default.Save(); // Lưu thay đổi
+                Properties.Settings.Default.Save();
 
                 MessageBox.Show("Đăng nhập thành công! Xin chào " + loginAccount.DisplayName);
 
-                // --- QUAN TRỌNG: Truyền Account sang Form Chính ---
                 fSinhVien f = new fSinhVien(loginAccount);
-
                 this.Hide();
                 f.ShowDialog();
                 this.Show();
@@ -114,10 +109,6 @@ namespace ProjectQuanLySinhVien.GUI
             return null;
         }
 
-        // Nút Thoát (Viết thêm cho đủ bộ nếu cần)
-        private void btnThoat_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
+        
     }
 }
