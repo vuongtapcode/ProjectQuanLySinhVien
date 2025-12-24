@@ -41,17 +41,30 @@ Các tài khoản được khởi tạo sẵn trong cơ sở dữ liệu (Bảng
 ## 5. Hướng dẫn cài đặt
 
 Để ứng dụng hoạt động, vui lòng thực hiện các bước sau:
+**Bước 1: Tải mã nguồn (Source Code)**
 
-**Bước 1: Cấu hình Cơ sở dữ liệu**
+*Cách 1: Download trực tiếp (Khuyến nghị)*
+1. Truy cập repository GitHub của project.
+2. Nhấn nút **Code** -> chọn **Download ZIP**.
+3. Giải nén file vừa tải về.
+4. Mở file `ProjectQuanLySinhVien.sln` bằng **Visual Studio**.
+
+*Cách 2: Clone bằng Git*
+Mở Terminal hoặc Git Bash và chạy lệnh sau:
+```bash
+git clone [https://github.com/vuongtapcode/ProjectQuanLySinhVien.git](https://github.com/vuongtapcode/ProjectQuanLySinhVien.git)
+```
+
+**Bước 2: Cấu hình Cơ sở dữ liệu**
 1.  Mở SQL Server Management Studio.
 2.  Chạy file script `SQLQuanLySinhVien.sql` (trong thư mục SQLQuanLySinhVien) để tạo bảng và dữ liệu mẫu.
 
-**Bước 2: Cấu hình kết nối**
+**Bước 3: Cấu hình kết nối**
 1.  Mở project bằng Visual Studio.
 2.  Tìm biến chuỗi kết nối `strKetNoi` trong các file code (Form).
 3.  Cập nhật tham số `Data Source` thành tên máy chủ SQL của bạn (Ví dụ: `Data Source=DESKTOP-XXXX\SQLEXPRESS`).
 
-**Bước 3: Chạy ứng dụng**
+**Bước 4: Chạy ứng dụng**
 * Nhấn **Start** hoặc **F5** trong Visual Studio để khởi chạy chương trình.
 
 ## 6. Nhóm tác giả
