@@ -35,8 +35,8 @@ Các tài khoản được khởi tạo sẵn trong cơ sở dữ liệu (Bảng
 
 | Vai trò | Tên đăng nhập | Mật khẩu | Quyền hạn |
 |---|---|---|---|
-| **Quản trị viên** | admin | admin123 | Toàn quyền (Full Access) |
-| **Nhân viên** | staff | staff123 | Chỉ xem và tìm kiếm (Read Only) |
+| **Quản trị viên** | admin | 1 | Toàn quyền (Full Access) |
+| **Nhân viên** | staff | 1 | Chỉ xem và tìm kiếm (Read Only) |
 
 ## 5. Hướng dẫn cài đặt
 
@@ -64,4 +64,4 @@ Các tài khoản được khởi tạo sẵn trong cơ sở dữ liệu (Bảng
 | 3 | **Trịnh Quang Giang** | 24520425 |
 
 ---
-*Lưu ý: Project phục vụ mục đích học tập và nghiên cứu.*
+*Lưu ý: Project phục vụ mục đích học tập và nghiên cứu, không sử dụng cho môi trường thực tế.*
