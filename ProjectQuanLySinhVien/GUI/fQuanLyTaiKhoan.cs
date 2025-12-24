@@ -9,7 +9,7 @@ namespace ProjectQuanLySinhVien.GUI
     public partial class fQuanLyTaiKhoan : Form
     {
         string strKetNoi = @"Data Source=DESKTOP-E2VL8VG\SQLEXPRESS;Initial Catalog=QLSV_DB;Integrated Security=True;TrustServerCertificate=True";
-
+        SqlConnection conn = null;
         public fQuanLyTaiKhoan()
         {
             InitializeComponent();
@@ -36,7 +36,6 @@ namespace ProjectQuanLySinhVien.GUI
         }
         private void btnThem_Click(object sender, EventArgs e)
         {
-            // --- 1.Kiểm tra dữ liệu đầu vào ---
             if (string.IsNullOrWhiteSpace(txbTenDangNhap.Text))
             {
                 MessageBox.Show("Vui lòng nhập Tên đăng nhập!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -52,15 +51,11 @@ namespace ProjectQuanLySinhVien.GUI
                 MessageBox.Show("Vui lòng nhập Mật khẩu!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txbMatKhau.Focus(); return;
             }
-
-            // --- 2. XỬ LÝ SQL ---
             using (SqlConnection conn = new SqlConnection(strKetNoi))
             {
                 try
                 {
                     conn.Open();
-
-                    // Kiểm tra trùng Tên đăng nhập
                     string checkQuery = "SELECT COUNT(*) FROM ACCOUNT WHERE UserName = @User";
                     SqlCommand cmdCheck = new SqlCommand(checkQuery, conn);
                     cmdCheck.Parameters.AddWithValue("@User", txbTenDangNhap.Text.Trim());
@@ -72,8 +67,6 @@ namespace ProjectQuanLySinhVien.GUI
                         txbTenDangNhap.Focus();
                         return;
                     }
-
-                    // Thực hiện Thêm
                     string query = "INSERT INTO ACCOUNT (UserName, DisplayName, PassWord, Type) VALUES (@User, @Name, @Pass, @Type)";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@User", txbTenDangNhap.Text.Trim());
@@ -95,13 +88,11 @@ namespace ProjectQuanLySinhVien.GUI
         }
         private void btnSua_Click(object sender, EventArgs e)
         {
-            // Kiểm tra đã chọn tài khoản chưa
             if (string.IsNullOrWhiteSpace(txbTenDangNhap.Text))
             {
                 MessageBox.Show("Vui lòng chọn tài khoản cần sửa!", "Thông báo"); return;
             }
 
-            // Kiểm tra xem có xóa trống Tên hiển thị hoặc Mật khẩu không
             if (string.IsNullOrWhiteSpace(txbTenHienThi.Text))
             {
                 MessageBox.Show("Tên hiển thị không được để trống!", "Cảnh báo");
@@ -118,7 +109,6 @@ namespace ProjectQuanLySinhVien.GUI
                 try
                 {
                     conn.Open();
-                    // Cập nhật thông tin dựa trên UserName
                     string query = "UPDATE ACCOUNT SET DisplayName = @Name, PassWord = @Pass, Type = @Type WHERE UserName = @User";
                     SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -178,7 +168,6 @@ namespace ProjectQuanLySinhVien.GUI
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            // 1. Chặn click vào tiêu đề hoặc dòng trống cuối cùng
             if (e.RowIndex < 0 || e.RowIndex == dataGridView1.NewRowIndex) return;
 
             try
@@ -188,12 +177,9 @@ namespace ProjectQuanLySinhVien.GUI
                 txbTenHienThi.Text = Convert.ToString(r.Cells[2].Value);
                 txbMatKhau.Text = Convert.ToString(r.Cells[3].Value);
                 string val = Convert.ToString(r.Cells[4].Value);
-
-                // Xử lý logic gán giá trị cho ô số (NumericUpDown)
                 if (!string.IsNullOrEmpty(val))
                 {
                     decimal so;
-                    // Thử ép kiểu, nếu thành công thì gán, không thì về 0
                     if (decimal.TryParse(val, out so))
                     {
                         if (so >= nmLoaiTaiKhoan.Minimum && so <= nmLoaiTaiKhoan.Maximum)
@@ -221,6 +207,50 @@ namespace ProjectQuanLySinhVien.GUI
             {
             }
         }
-        
+
+        private void btnTim_Click(object sender, EventArgs e)
+        {
+            string tuKhoa = txbTimKiem.Text.Trim();
+            if (string.IsNullOrEmpty(tuKhoa))
+            {
+                LoadGrid();
+                return;
+            }
+
+            try
+            {
+
+                if (conn == null) conn = new SqlConnection(strKetNoi);
+                if (conn.State == ConnectionState.Closed) conn.Open();
+                string sql = @"SELECT UserName, DisplayName, PassWord, Type 
+                           FROM ACCOUNT 
+                           WHERE UserName LIKE '%' + @kw + '%' 
+                              OR DisplayName COLLATE SQL_Latin1_General_CP1_CI_AI LIKE N'%' + @kw + '%'";
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@kw", tuKhoa);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                dataGridView1.DataSource = dt;
+                if (dt.Rows.Count == 0)
+                {
+                    MessageBox.Show("Không tìm thấy Tài khoản nào phù hợp!", "Thông báo");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message);
+            }
+        }
+
+        private void txbTimKiem_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnTim.PerformClick();
+            }
+        }
     }
 }

@@ -21,8 +21,97 @@ namespace ProjectQuanLySinhVien.GUI
             LoadDataSinhVien();
             PhanQuyen();
         }
+        void PhanQuyen()
+        {
+            if (BienToanCuc.LoaiTaiKhoan == 0)
+            {
+           
+                btnThem.Enabled = false;
+                btnSua.Enabled = false;
+                btnXoa.Enabled = false;
+                
+                txbMSSV.ReadOnly = true;
+                txbTenSV.ReadOnly = true;
+                txbQueQuan.ReadOnly = true;
 
-        // --- HÀM HỖ TRỢ LOAD COMBOBOX (Dùng chung) ---
+                dtpkNgaySinh.Enabled = false;
+                stpkNgayNhapHoc.Enabled = false;
+                radNam.Enabled = false;
+                radNu.Enabled = false;
+
+                cbKhoa.Enabled = false;
+                cbLop.Enabled = false;
+
+                this.Text = "Quản Lý Sinh Viên - Xin chào: " + loginAccount.DisplayName + " (Quyền: Nhân viên - Chỉ xem)";
+            }
+            else
+            {
+                btnThem.Enabled = true;
+                btnSua.Enabled = true;
+                btnXoa.Enabled = true;
+                txbMSSV.ReadOnly = false;
+                txbTenSV.ReadOnly = false;
+                txbQueQuan.ReadOnly = false;
+
+                dtpkNgaySinh.Enabled = true;
+                stpkNgayNhapHoc.Enabled = true;
+                radNam.Enabled = true;
+                radNu.Enabled = true;
+                cbKhoa.Enabled = true;
+                cbLop.Enabled = true;
+
+                this.Text = "Quản Lý Sinh Viên - Xin chào: " + loginAccount.DisplayName + " (Quyền: Admin)";
+            }
+        }
+        private void btnTim_Click(object sender, EventArgs e)
+        {
+            string tuKhoa = txbTimKiem.Text.Trim();
+
+            if (string.IsNullOrEmpty(tuKhoa))
+            {
+                LoadDataSinhVien();
+                return;
+            }
+
+            try
+            {
+                if (conn == null) conn = new SqlConnection(strKetNoi);
+                if (conn.State == ConnectionState.Closed) conn.Open();
+                string sql = @"
+                SELECT SV.MaSV, SV.HoTen, SV.NgaySinh, SV.GioiTinh, SV.QueQuan, SV.NgayNhapHoc, SV.MaLop, L.MaKhoa
+                FROM SINHVIEN SV LEFT JOIN LOP L ON SV.MaLop = L.MaLop
+                WHERE SV.HoTen COLLATE SQL_Latin1_General_CP1_CI_AI LIKE N'%' + @kw + '%' OR SV.MaSV LIKE '%' + @kw + '%'"; 
+                
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@kw", tuKhoa);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                dt.Columns.Add("STT", typeof(int));
+                for (int i = 0; i < dt.Rows.Count; i++) dt.Rows[i]["STT"] = i + 1;
+
+                dataGridView1.DataSource = dt;
+
+                if (dt.Rows.Count == 0)
+                {
+                    MessageBox.Show("Không tìm thấy sinh viên nào!", "Kết quả");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tìm kiếm: " + ex.Message);
+            }
+        }
+        private void txbTimKiem_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnTim.PerformClick();            
+            }
+        }
         private void FillComboBox(string sql, ComboBox cb, string hienThi, string giaTri)
         {
             try
@@ -33,42 +122,31 @@ namespace ProjectQuanLySinhVien.GUI
                 SqlDataAdapter da = new SqlDataAdapter(sql, conn);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
-
-                // Gắt kết nối dữ liệu
                 cb.DataSource = dt;
-                cb.DisplayMember = hienThi; // Cột hiện tên 
-                cb.ValueMember = giaTri;    // Cột lấy giá trị ngầm 
-                cb.SelectedIndex = -1;      // Mặc định không chọn gì
+                cb.DisplayMember = hienThi; 
+                cb.ValueMember = giaTri;    
+                cb.SelectedIndex = -1;      
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi tải ComboBox: " + ex.Message);
             }
         }
-
-        // 1. Load danh sách KHOA 
         private void LoadComboBoxKhoa()
         {
             FillComboBox("SELECT MaKhoa, TenKhoa FROM KHOA", cbKhoa, "TenKhoa", "MaKhoa");
         }
-
-        // 2. Sự kiện: Chọn Khoa -> Tự động load Lớp tương ứng
         private void cbKhoa_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbKhoa.SelectedValue != null)
             {
-                // Nếu SelectedValue là DataRowView (nghĩa là chưa lấy được chuỗi MaKhoa) thì dừng
                 if (cbKhoa.SelectedValue is DataRowView) return;
 
                 string maKhoa = cbKhoa.SelectedValue.ToString();
-
-                // Load Lớp thuộc Khoa đó
                 string sql = "SELECT MaLop, TenLop FROM LOP WHERE MaKhoa = '" + maKhoa + "'";
                 FillComboBox(sql, cbLop, "TenLop", "MaLop");
             }
         }
-
-        // --- HÀM TẢI DỮ LIỆU LÊN BẢNG ---
         private void LoadDataSinhVien()
         {
             try
@@ -91,7 +169,6 @@ namespace ProjectQuanLySinhVien.GUI
                 for (int i = 0; i < dt.Rows.Count; i++) dt.Rows[i]["STT"] = i + 1;
 
                 dataGridView1.AutoGenerateColumns = false;
-                // Mapping dữ liệu
                 if (dataGridView1.Columns["Column1"] != null) dataGridView1.Columns["Column1"].DataPropertyName = "STT";
                 if (dataGridView1.Columns["Column2"] != null) dataGridView1.Columns["Column2"].DataPropertyName = "MaSV";
                 if (dataGridView1.Columns["Column3"] != null) dataGridView1.Columns["Column3"].DataPropertyName = "HoTen";
@@ -103,8 +180,8 @@ namespace ProjectQuanLySinhVien.GUI
                 if (dataGridView1.Columns["Column5"] != null) dataGridView1.Columns["Column5"].DataPropertyName = "GioiTinh";
                 if (dataGridView1.Columns["Column6"] != null) dataGridView1.Columns["Column6"].DataPropertyName = "QueQuan";
                 if (dataGridView1.Columns["Column7"] != null) dataGridView1.Columns["Column7"].DataPropertyName = "NgayNhapHoc";
-                if (dataGridView1.Columns["Column8"] != null) dataGridView1.Columns["Column8"].DataPropertyName = "MaLop";  // Ẩn hoặc hiện tùy bạn
-                if (dataGridView1.Columns["Column9"] != null) dataGridView1.Columns["Column9"].DataPropertyName = "MaKhoa"; // Ẩn hoặc hiện tùy bạn
+                if (dataGridView1.Columns["Column8"] != null) dataGridView1.Columns["Column8"].DataPropertyName = "MaLop";  
+                if (dataGridView1.Columns["Column9"] != null) dataGridView1.Columns["Column9"].DataPropertyName = "MaKhoa"; 
 
                 dataGridView1.DataSource = dt;
             }
@@ -113,8 +190,6 @@ namespace ProjectQuanLySinhVien.GUI
                 MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message);
             }
         }
-
-        // --- XỬ LÝ CLICK VÀO BẢNG ---
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -134,40 +209,28 @@ namespace ProjectQuanLySinhVien.GUI
 
                 if (row.Cells["Column7"].Value != DBNull.Value)
                     stpkNgayNhapHoc.Value = Convert.ToDateTime(row.Cells["Column7"].Value);
-
-                // --- XỬ LÝ COMBOBOX KHI CLICK ---
                 string maKhoaTrongBang = row.Cells["Column9"].Value?.ToString();
                 string maLopTrongBang = row.Cells["Column8"].Value?.ToString();
-
-                // 1. Gán Khoa trước -> Code sự kiện SelectedIndexChanged sẽ chạy -> Load Lớp
                 cbKhoa.SelectedValue = maKhoaTrongBang;
-
-                // 2. Gán Lớp sau
                 if (cbLop.Items.Count > 0)
                 {
                     cbLop.SelectedValue = maLopTrongBang;
                 }
 
-                txbMSSV.Enabled = false; // Khóa Mã SV khi sửa
+                txbMSSV.Enabled = false; 
             }
         }
-
-        // --- CÁC NÚT CHỨC NĂNG ---
-
         private void btnThem_Click(object sender, EventArgs e)
         {
-            // Validation
             if (string.IsNullOrWhiteSpace(txbMSSV.Text) || string.IsNullOrWhiteSpace(txbTenSV.Text))
             {
                 MessageBox.Show("Vui lòng nhập đầy đủ Mã và Tên Sinh Viên!", "Cảnh báo"); return;
             }
-            // Kiểm tra Quê Quán
             if (string.IsNullOrWhiteSpace(txbQueQuan.Text))
             {
                 MessageBox.Show("Vui lòng nhập Quê Quán!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txbQueQuan.Focus(); return;
             }
-            // Kiểm tra xem đã chọn Khoa và Lớp chưa
             if (cbKhoa.SelectedIndex == -1 || cbLop.SelectedIndex == -1)
             {
                 MessageBox.Show("Vui lòng chọn Khoa và Lớp!", "Cảnh báo"); return;
@@ -192,8 +255,6 @@ namespace ProjectQuanLySinhVien.GUI
                 cmd.Parameters.AddWithValue("@gt", radNam.Checked ? "Nam" : "Nữ");
                 cmd.Parameters.AddWithValue("@que", txbQueQuan.Text);
                 cmd.Parameters.AddWithValue("@nhaphoc", stpkNgayNhapHoc.Value);
-
-                // Lấy Mã Lớp từ ComboBox
                 cmd.Parameters.AddWithValue("@malop", cbLop.SelectedValue.ToString());
 
                 cmd.ExecuteNonQuery();
@@ -206,7 +267,6 @@ namespace ProjectQuanLySinhVien.GUI
         private void btnSua_Click(object sender, EventArgs e)
         {
             if (txbMSSV.Text == "") return;
-            // Kiểm tra chọn lớp chưa
             if (cbLop.SelectedIndex == -1)
             {
                 MessageBox.Show("Vui lòng chọn Lớp mới cần chuyển đến (nếu có)!", "Thông báo"); return;
@@ -225,8 +285,6 @@ namespace ProjectQuanLySinhVien.GUI
                 cmd.Parameters.AddWithValue("@gt", radNam.Checked ? "Nam" : "Nữ");
                 cmd.Parameters.AddWithValue("@que", txbQueQuan.Text);
                 cmd.Parameters.AddWithValue("@nhaphoc", stpkNgayNhapHoc.Value);
-
-                // Lấy Mã Lớp từ ComboBox
                 cmd.Parameters.AddWithValue("@malop", cbLop.SelectedValue.ToString());
 
                 cmd.ExecuteNonQuery();
@@ -244,9 +302,7 @@ namespace ProjectQuanLySinhVien.GUI
                 try
                 {
                     if (conn.State == ConnectionState.Closed) conn.Open();
-                    // Xóa điểm trước
                     new SqlCommand("DELETE FROM KETQUA WHERE MaSV='" + txbMSSV.Text + "'", conn).ExecuteNonQuery();
-                    // Xóa sinh viên
                     new SqlCommand("DELETE FROM SINHVIEN WHERE MaSV='" + txbMSSV.Text + "'", conn).ExecuteNonQuery();
 
                     MessageBox.Show("Xóa thành công!");
@@ -274,37 +330,21 @@ namespace ProjectQuanLySinhVien.GUI
         {
             txbMSSV.Text = ""; txbTenSV.Text = ""; txbQueQuan.Text = "";
             radNam.Checked = true; txbMSSV.Enabled = true;
-
-            // Reset ComboBox
             cbKhoa.SelectedIndex = -1;
-            cbLop.DataSource = null; // Xóa danh sách lớp cũ
+            cbLop.DataSource = null; 
         }
 
-        private void btnTaiLai_Click(object sender, EventArgs e) { ResetForm(); LoadDataSinhVien(); }
-        void PhanQuyen()
-        {
-            if (BienToanCuc.LoaiTaiKhoan == 0)
-            {
-                btnThem.Enabled = false;
-                btnSua.Enabled = false;
-                btnXoa.Enabled = false;
-                this.Text += " (Quyền: Nhân viên - Chỉ xem)";
-            }
-            else
-            {
-                this.Text += " (Quyền: Admin - Toàn quyền)";
-            }
+        private void btnTaiLai_Click(object sender, EventArgs e) { 
+            ResetForm(); 
+            LoadDataSinhVien(); 
         }
         private void quảnLýTàiKhoảnToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // KIỂM TRA QUYỀN TRƯỚC: Nếu là Nhân viên (0) thì chặn ngay từ cửa
             if (BienToanCuc.LoaiTaiKhoan == 0)
             {
                 MessageBox.Show("Bạn không có quyền truy cập vào quản lý tài khoản!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return; 
             }
-
-            // Nếu là Admin thì mới cho tạo và mở Form
             fQuanLyTaiKhoan f = new fQuanLyTaiKhoan();
             this.Hide();
             f.ShowDialog();
@@ -362,11 +402,9 @@ namespace ProjectQuanLySinhVien.GUI
         {
             fThongTinTaiKhoan f = new fThongTinTaiKhoan(this.loginAccount);
             DialogResult result = f.ShowDialog();
-
-            // Nếu đổi mật khẩu thành công
             if (result == DialogResult.OK)
             {
-                this.Close(); // Đóng form Sinh Viên -> Sẽ tự quay về form Đăng Nhập
+                this.Close();
             }
         }
 

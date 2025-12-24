@@ -16,7 +16,10 @@
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(fQuanLyMonHoc));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.txbTimKiem = new System.Windows.Forms.TextBox();
+            this.btnTim = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.nmrSoTinChi = new System.Windows.Forms.NumericUpDown();
             this.lbSoTinChi = new System.Windows.Forms.Label();
@@ -52,6 +55,8 @@
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.BackColor = System.Drawing.Color.White;
+            this.splitContainer1.Panel1.Controls.Add(this.txbTimKiem);
+            this.splitContainer1.Panel1.Controls.Add(this.btnTim);
             this.splitContainer1.Panel1.Controls.Add(this.groupBox1);
             this.splitContainer1.Panel1.Controls.Add(this.btnLamMoi);
             this.splitContainer1.Panel1.Controls.Add(this.btnXoa);
@@ -61,9 +66,37 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.dataGridView1);
-            this.splitContainer1.Size = new System.Drawing.Size(1000, 600);
+            this.splitContainer1.Size = new System.Drawing.Size(1130, 734);
             this.splitContainer1.SplitterDistance = 200;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // txbTimKiem
+            // 
+            this.txbTimKiem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txbTimKiem.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txbTimKiem.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txbTimKiem.Location = new System.Drawing.Point(33, 151);
+            this.txbTimKiem.Name = "txbTimKiem";
+            this.txbTimKiem.Size = new System.Drawing.Size(250, 42);
+            this.txbTimKiem.TabIndex = 21;
+            this.txbTimKiem.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txbTimKiem_KeyDown);
+            // 
+            // btnTim
+            // 
+            this.btnTim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnTim.BackColor = System.Drawing.Color.Black;
+            this.btnTim.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnTim.FlatAppearance.BorderSize = 0;
+            this.btnTim.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTim.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTim.ForeColor = System.Drawing.Color.White;
+            this.btnTim.Location = new System.Drawing.Point(293, 146);
+            this.btnTim.Name = "btnTim";
+            this.btnTim.Size = new System.Drawing.Size(80, 40);
+            this.btnTim.TabIndex = 22;
+            this.btnTim.Text = "TÌM";
+            this.btnTim.UseVisualStyleBackColor = false;
+            this.btnTim.Click += new System.EventHandler(this.btnTim_Click);
             // 
             // groupBox1
             // 
@@ -79,7 +112,7 @@
             this.groupBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(976, 120);
+            this.groupBox1.Size = new System.Drawing.Size(1106, 120);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "THÔNG TIN MÔN HỌC";
@@ -88,7 +121,7 @@
             // 
             this.nmrSoTinChi.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.nmrSoTinChi.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.nmrSoTinChi.Location = new System.Drawing.Point(740, 42);
+            this.nmrSoTinChi.Location = new System.Drawing.Point(870, 42);
             this.nmrSoTinChi.Maximum = new decimal(new int[] {
             10,
             0,
@@ -114,7 +147,7 @@
             this.lbSoTinChi.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lbSoTinChi.AutoSize = true;
             this.lbSoTinChi.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lbSoTinChi.Location = new System.Drawing.Point(650, 45);
+            this.lbSoTinChi.Location = new System.Drawing.Point(780, 45);
             this.lbSoTinChi.Name = "lbSoTinChi";
             this.lbSoTinChi.Size = new System.Drawing.Size(119, 32);
             this.lbSoTinChi.TabIndex = 4;
@@ -128,7 +161,7 @@
             this.txtTenMon.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.txtTenMon.Location = new System.Drawing.Point(375, 42);
             this.txtTenMon.Name = "txtTenMon";
-            this.txtTenMon.Size = new System.Drawing.Size(250, 39);
+            this.txtTenMon.Size = new System.Drawing.Size(380, 39);
             this.txtTenMon.TabIndex = 2;
             // 
             // lbTenMon
@@ -167,7 +200,7 @@
             this.btnLamMoi.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLamMoi.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnLamMoi.ForeColor = System.Drawing.Color.White;
-            this.btnLamMoi.Location = new System.Drawing.Point(860, 145);
+            this.btnLamMoi.Location = new System.Drawing.Point(990, 145);
             this.btnLamMoi.Name = "btnLamMoi";
             this.btnLamMoi.Size = new System.Drawing.Size(120, 39);
             this.btnLamMoi.TabIndex = 7;
@@ -182,7 +215,7 @@
             this.btnXoa.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnXoa.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnXoa.ForeColor = System.Drawing.Color.White;
-            this.btnXoa.Location = new System.Drawing.Point(599, 145);
+            this.btnXoa.Location = new System.Drawing.Point(729, 145);
             this.btnXoa.Name = "btnXoa";
             this.btnXoa.Size = new System.Drawing.Size(116, 39);
             this.btnXoa.TabIndex = 5;
@@ -197,7 +230,7 @@
             this.btnSua.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSua.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnSua.ForeColor = System.Drawing.Color.White;
-            this.btnSua.Location = new System.Drawing.Point(732, 145);
+            this.btnSua.Location = new System.Drawing.Point(862, 145);
             this.btnSua.Name = "btnSua";
             this.btnSua.Size = new System.Drawing.Size(113, 39);
             this.btnSua.TabIndex = 6;
@@ -212,7 +245,7 @@
             this.btnThem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnThem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnThem.ForeColor = System.Drawing.Color.White;
-            this.btnThem.Location = new System.Drawing.Point(470, 145);
+            this.btnThem.Location = new System.Drawing.Point(600, 145);
             this.btnThem.Name = "btnThem";
             this.btnThem.Size = new System.Drawing.Size(113, 39);
             this.btnThem.TabIndex = 4;
@@ -261,7 +294,7 @@
             this.dataGridView1.RowHeadersWidth = 72;
             this.dataGridView1.RowTemplate.Height = 35;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(1000, 396);
+            this.dataGridView1.Size = new System.Drawing.Size(1130, 530);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             // 
@@ -293,13 +326,16 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1000, 600);
+            this.ClientSize = new System.Drawing.Size(1130, 734);
             this.Controls.Add(this.splitContainer1);
             this.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "fQuanLyMonHoc";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Quản lý môn học";
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
@@ -316,24 +352,20 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.DataGridView dataGridView1;
-
-        // Các control nhập liệu
         private System.Windows.Forms.TextBox txtMaMon;
         private System.Windows.Forms.TextBox txtTenMon;
         private System.Windows.Forms.NumericUpDown nmrSoTinChi;
         private System.Windows.Forms.Label lbMaMon;
         private System.Windows.Forms.Label lbTenMon;
         private System.Windows.Forms.Label lbSoTinChi;
-
-        // Các nút bấm
         private System.Windows.Forms.Button btnLamMoi;
         private System.Windows.Forms.Button btnXoa;
         private System.Windows.Forms.Button btnSua;
         private System.Windows.Forms.Button btnThem;
-
-        // Các cột
         private System.Windows.Forms.DataGridViewTextBoxColumn colMaMon;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTenMon;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSoTinChi;
+        private System.Windows.Forms.TextBox txbTimKiem;
+        private System.Windows.Forms.Button btnTim;
     }
 }

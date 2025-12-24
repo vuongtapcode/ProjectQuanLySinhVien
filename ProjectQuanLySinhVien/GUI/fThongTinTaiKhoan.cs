@@ -46,19 +46,13 @@ namespace ProjectQuanLySinhVien.GUI
                 MessageBox.Show("Mật khẩu mới và nhập lại không khớp!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            // Xử lý Logic Database
             try
             {
-                // Dùng 'using' để tự động mở và đóng kết nối (Tránh lỗi Null Connection)
                 using (SqlConnection connection = new SqlConnection(strKetNoi))
                 {
                     connection.Open();
-
-                    // --- BƯỚC 1: KIỂM TRA MẬT KHẨU CŨ ---
                     string sqlCheck = "SELECT COUNT(*) FROM ACCOUNT WHERE UserName=@user AND PassWord=@pass";
                     SqlCommand cmdCheck = new SqlCommand(sqlCheck, connection);
-
-                    // Lấy UserName từ loginAccount 
                     cmdCheck.Parameters.AddWithValue("@user", loginAccount.UserName);
                     cmdCheck.Parameters.AddWithValue("@pass", matKhauCu);
 
@@ -68,14 +62,10 @@ namespace ProjectQuanLySinhVien.GUI
                         MessageBox.Show("Mật khẩu cũ không đúng!");
                         return;
                     }
-
-                    // --- BƯỚC 2: THỰC HIỆN CẬP NHẬT ---
                     SqlCommand cmdUpdate = new SqlCommand();
                     cmdUpdate.Connection = connection;
 
                     string sqlUpdate = "";
-
-                    // Trường hợp A: Có đổi mật khẩu mới
                     if (!string.IsNullOrEmpty(matKhauMoi))
                     {
    
@@ -83,25 +73,20 @@ namespace ProjectQuanLySinhVien.GUI
                         sqlUpdate = "UPDATE ACCOUNT SET DisplayName=@name, PassWord=@newPass WHERE UserName=@user";
                         cmdUpdate.Parameters.AddWithValue("@newPass", matKhauMoi);
                     }
-                    // Trường hợp B: Chỉ đổi tên hiển thị (Mật khẩu giữ nguyên)
                     else
                     {
                         sqlUpdate = "UPDATE ACCOUNT SET DisplayName=@name WHERE UserName=@user";
                     }
 
                     cmdUpdate.CommandText = sqlUpdate;
-
-                    // Add tham số chung
                     cmdUpdate.Parameters.AddWithValue("@name", tenHienThi);
-                    cmdUpdate.Parameters.AddWithValue("@user", loginAccount.UserName); // Dùng loginAccount
+                    cmdUpdate.Parameters.AddWithValue("@user", loginAccount.UserName); 
 
                     int rowsAffected = cmdUpdate.ExecuteNonQuery();
 
                     if (rowsAffected > 0)
                     {
                         MessageBox.Show("Cập nhật thành công! Vui lòng đăng nhập lại để áp dụng thay đổi.");
-
-                        // (Tùy chọn) Cập nhật lại biến cục bộ để nếu chưa thoát form thì thấy ngay
                         loginAccount.DisplayName = tenHienThi;
                         this.DialogResult = DialogResult.OK;
                         this.Close();

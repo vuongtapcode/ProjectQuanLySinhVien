@@ -8,7 +8,7 @@ namespace ProjectQuanLySinhVien.GUI
     public partial class fQuanLyMonHoc : Form
     {
         string strKetNoi = @"Data Source=DESKTOP-E2VL8VG\SQLEXPRESS;Initial Catalog=QLSV_DB;Integrated Security=True;TrustServerCertificate=True";
-
+        SqlConnection conn = null;
         public fQuanLyMonHoc()
         {
             InitializeComponent();
@@ -22,12 +22,26 @@ namespace ProjectQuanLySinhVien.GUI
                 btnThem.Enabled = false;
                 btnSua.Enabled = false;
                 btnXoa.Enabled = false;
+                txtMaMon.ReadOnly = true;
+                txtTenMon.ReadOnly = true;
+                nmrSoTinChi.Enabled = false;
+                this.Text = "Quản Lý Môn Học (Quyền: Nhân viên - Chỉ xem)";
             }
-        }
-        
-        
+            else
+            {
+                btnThem.Enabled = true;
+                btnSua.Enabled = true;
+                btnXoa.Enabled = true;
+                btnLamMoi.Enabled = true;
 
-        // ================= LOAD GRID (Tải dữ liệu) =================
+                txtMaMon.ReadOnly = false;
+                txtTenMon.ReadOnly = false;
+                nmrSoTinChi.Enabled = true;
+
+                this.Text = "Quản Lý Môn Học (Quyền: Admin)";
+            
+        }
+    }
         private void LoadGrid()
         {
             using (SqlConnection conn = new SqlConnection(strKetNoi))
@@ -48,8 +62,6 @@ namespace ProjectQuanLySinhVien.GUI
                 }
             }
         }
-
-        // ================= THÊM (INSERT) =================
         private void btnThem_Click(object sender, EventArgs e)
         {
             if (txtMaMon.Text.Trim() == "" || txtTenMon.Text.Trim() == "")
@@ -62,8 +74,6 @@ namespace ProjectQuanLySinhVien.GUI
                 try
                 {
                     conn.Open();
-
-                    // 1. Kiểm tra trùng
                     string checkQuery = "SELECT COUNT(*) FROM MONHOC WHERE MaMH = @MaMH";
                     SqlCommand cmdCheck = new SqlCommand(checkQuery, conn);
                     cmdCheck.Parameters.AddWithValue("@MaMH", txtMaMon.Text.Trim());
@@ -72,8 +82,6 @@ namespace ProjectQuanLySinhVien.GUI
                     {
                         MessageBox.Show("Mã môn học này đã tồn tại!"); return;
                     }
-
-                    // 2. Thêm mới
                     string query = "INSERT INTO MONHOC (MaMH, TenMH, SoTinChi) VALUES (@MaMH, @TenMH, @SoTinChi)";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@MaMH", txtMaMon.Text.Trim());
@@ -92,26 +100,19 @@ namespace ProjectQuanLySinhVien.GUI
                 }
             }
         }
-
-        // ================= SỬA (UPDATE) =================
         private void btnSua_Click(object sender, EventArgs e)
         {
-            // 1. Kiểm tra xem đã chọn/nhập Mã môn chưa
             if (string.IsNullOrWhiteSpace(txtMaMon.Text))
             {
                 MessageBox.Show("Vui lòng chọn môn học cần sửa!", "Thông báo");
                 return;
             }
-
-            // 2. Kiểm tra Tên môn có bị bỏ trống không
             if (string.IsNullOrWhiteSpace(txtTenMon.Text))
             {
                 MessageBox.Show("Tên môn học không được để trống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtTenMon.Focus(); // Đưa con trỏ chuột về ô Tên môn để nhập lại
+                txtTenMon.Focus(); 
                 return;
             }
-
-            // 3. Thực hiện Update
             using (SqlConnection conn = new SqlConnection(strKetNoi))
             {
                 try
@@ -123,14 +124,12 @@ namespace ProjectQuanLySinhVien.GUI
                     cmd.Parameters.AddWithValue("@MaMH", txtMaMon.Text.Trim());
                     cmd.Parameters.AddWithValue("@TenMH", txtTenMon.Text.Trim());
                     cmd.Parameters.AddWithValue("@SoTinChi", nmrSoTinChi.Value);
-
-                    // Kiểm tra xem có dòng nào được cập nhật không
                     int rows = cmd.ExecuteNonQuery();
                     if (rows > 0)
                     {
                         MessageBox.Show("Cập nhật thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LoadGrid(); // Tải lại bảng
-                        LamMoi();   // Xóa trắng ô nhập
+                        LoadGrid(); 
+                        LamMoi();  
                     }
                     else
                     {
@@ -143,8 +142,6 @@ namespace ProjectQuanLySinhVien.GUI
                 }
             }
         }
-
-        // ================= XÓA (DELETE) =================
         private void btnXoa_Click(object sender, EventArgs e)
         {
             if (txtMaMon.Text.Trim() == "") return;
@@ -177,8 +174,6 @@ namespace ProjectQuanLySinhVien.GUI
                 }
             }
         }
-
-        // ================= LÀM MỚI =================
         private void btnLamMoi_Click(object sender, EventArgs e)
         {
             LamMoi();
@@ -191,8 +186,6 @@ namespace ProjectQuanLySinhVien.GUI
             nmrSoTinChi.Value = 3;
             txtMaMon.Enabled = true; 
         }
-
-        // ================= CLICK VÀO BẢNG =================
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || e.RowIndex == dataGridView1.NewRowIndex) return;
@@ -202,8 +195,6 @@ namespace ProjectQuanLySinhVien.GUI
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
                 txtMaMon.Text = row.Cells[0].Value.ToString();
                 txtTenMon.Text = row.Cells[1].Value.ToString();
-
-                // Xử lý số tín chỉ 
                 if (row.Cells[2].Value != DBNull.Value && row.Cells[2].Value != null)
                 {
                     nmrSoTinChi.Value = Convert.ToDecimal(row.Cells[2].Value);
@@ -221,6 +212,48 @@ namespace ProjectQuanLySinhVien.GUI
             }
         }
 
-        
+        private void btnTim_Click(object sender, EventArgs e)
+        {
+            string tuKhoa = txbTimKiem.Text.Trim();
+            if (string.IsNullOrEmpty(tuKhoa))
+            {
+                LoadGrid(); 
+                return;
+            }
+
+            try
+            {
+                
+                if (conn == null) conn = new SqlConnection(strKetNoi);
+                if (conn.State == ConnectionState.Closed) conn.Open();
+                string sql = @"SELECT * FROM MONHOC 
+                       WHERE MaMH LIKE '%' + @kw + '%' 
+                          OR TenMH COLLATE SQL_Latin1_General_CP1_CI_AI LIKE N'%' + @kw + '%'";
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@kw", tuKhoa);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                dataGridView1.DataSource = dt;
+                if (dt.Rows.Count == 0)
+                {
+                    MessageBox.Show("Không tìm thấy Môn học nào phù hợp!", "Thông báo");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message);
+            }
+        }
+
+        private void txbTimKiem_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnTim.PerformClick();
+            }
+        }
     }
 }

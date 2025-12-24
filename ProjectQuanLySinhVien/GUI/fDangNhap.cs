@@ -14,18 +14,15 @@ namespace ProjectQuanLySinhVien.GUI
         {
             InitializeComponent();
         }
-
-        // --- SỰ KIỆN: KHI FORM VỪA MỞ LÊN ---
         private void fDangNhap_Load(object sender, EventArgs e)
         {
             try
             {
-                // Tự động điền nếu đã lưu trước đó
                 if (!string.IsNullOrEmpty(Properties.Settings.Default.SavedUsername))
                 {
                     txbTaiKhoan.Text = Properties.Settings.Default.SavedUsername;
                     txbMatKhau.Text = Properties.Settings.Default.SavedPassword;
-                    chkGhiNho.Checked = true; // Tích sẵn vào ô ghi nhớ
+                    chkGhiNho.Checked = true; 
                 }
             }
             catch
@@ -33,8 +30,6 @@ namespace ProjectQuanLySinhVien.GUI
                 
             }
         }
-
-        // --- SỰ KIỆN: BẤM NÚT ĐĂNG NHẬP ---
         private void btnDangNhap_Click(object sender, EventArgs e)
         {
             string taiKhoan = txbTaiKhoan.Text;
@@ -47,11 +42,9 @@ namespace ProjectQuanLySinhVien.GUI
 
             Account loginAccount = LayTaiKhoan(taiKhoan, matKhau);
 
-            if (loginAccount != null) // Đăng nhập thành công
+            if (loginAccount != null) 
             {
                 BienToanCuc.LoaiTaiKhoan = loginAccount.Type;
-
-                // Xử lý ghi nhớ mật khẩu
                 if (chkGhiNho.Checked)
                 {
                     Properties.Settings.Default.SavedUsername = taiKhoan;
@@ -76,8 +69,6 @@ namespace ProjectQuanLySinhVien.GUI
                 MessageBox.Show("Sai tên tài khoản hoặc mật khẩu!");
             }
         }
-
-        // --- HÀM XỬ LÝ SQL ---
         private Account LayTaiKhoan(string tk, string mk)
         {
             try
@@ -94,8 +85,6 @@ namespace ProjectQuanLySinhVien.GUI
                     DataTable data = new DataTable();
                     SqlDataAdapter adapter = new SqlDataAdapter(command);
                     adapter.Fill(data);
-
-                    // Nếu tìm thấy tài khoản
                     if (data.Rows.Count > 0)
                     {
                         return new Account(data.Rows[0]);

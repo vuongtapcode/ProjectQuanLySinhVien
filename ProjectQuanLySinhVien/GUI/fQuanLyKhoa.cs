@@ -15,7 +15,25 @@ namespace ProjectQuanLySinhVien.GUI
         {
             InitializeComponent();
             LoadData();
-           
+            PhanQuyen();
+        }
+        void PhanQuyen()
+        {
+            if (BienToanCuc.LoaiTaiKhoan == 0) 
+            {
+                btnThem.Enabled = false;
+                btnSua.Enabled = false;
+                btnXoa.Enabled = false;
+                txtMaKhoa.Enabled = false;
+                txtTenKhoa.Enabled = false;
+
+                this.Text = "Quản Lý Khoa (Quyền: Nhân viên - Chỉ xem)";
+            }
+            else
+            {
+                this.Text = "Quản Lý Khoa (Quyền: Admin)";
+            }
+        
         }
         private void LoadData()
         {
@@ -35,8 +53,6 @@ namespace ProjectQuanLySinhVien.GUI
                 MessageBox.Show("Lỗi khi tải dữ liệu Khoa: " + ex.Message, "Lỗi kết nối", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        // Kiểm tra mã khoa đã tồn tại chưa
         private bool KiemTraMaKhoaTonTai(string maKhoa)
         {
             if (string.IsNullOrWhiteSpace(maKhoa)) return false;
@@ -53,7 +69,6 @@ namespace ProjectQuanLySinhVien.GUI
             }
             catch (Exception ex)
             {
-                // Nếu không thể kiểm tra, báo lỗi và trả về true để ngăn insert trùng khóa do lỗi kết nối
                 MessageBox.Show("Không thể kiểm tra tồn tại Mã Khoa. Vui lòng kiểm tra kết nối.\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return true;
             }
@@ -72,25 +87,19 @@ namespace ProjectQuanLySinhVien.GUI
 
         private void btnThem_Click(object sender, EventArgs e)
         {
-            // --- 1. KIỂM TRA DỮ LIỆU ĐẦU VÀO  ---
-
-            // Kiểm tra Mã Khoa
+           
             if (string.IsNullOrWhiteSpace(txtMaKhoa.Text))
             {
                 MessageBox.Show("Vui lòng nhập Mã Khoa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtMaKhoa.Focus();
                 return;
             }
-
-            // Kiểm tra Tên Khoa
             if (string.IsNullOrWhiteSpace(txtTenKhoa.Text))
             {
                 MessageBox.Show("Vui lòng nhập Tên Khoa!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtTenKhoa.Focus(); 
                 return;
             }
-
-            // --- 2. KIỂM TRA TRÙNG MÃ ---
             string ma = txtMaKhoa.Text.Trim();
             if (KiemTraMaKhoaTonTai(ma))
             {
@@ -99,8 +108,6 @@ namespace ProjectQuanLySinhVien.GUI
                 txtMaKhoa.SelectAll();
                 return;
             }
-
-            // --- 3. THỰC HIỆN INSERT ---
             try
             {
                 if (conn == null) conn = new SqlConnection(strKetNoi);
@@ -136,14 +143,11 @@ namespace ProjectQuanLySinhVien.GUI
 
         private void btnSua_Click(object sender, EventArgs e)
         {
-            // Kiểm tra nếu chưa chọn Mã Khoa
             if (string.IsNullOrWhiteSpace(txtMaKhoa.Text))
             {
                 MessageBox.Show("Vui lòng chọn Khoa cần sửa từ danh sách!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-
-            // Kiểm tra Tên Khoa có bị bỏ trống khi sửa không
             if (string.IsNullOrWhiteSpace(txtTenKhoa.Text))
             {
                 MessageBox.Show("Tên Khoa không được để trống!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -220,6 +224,44 @@ namespace ProjectQuanLySinhVien.GUI
             txtMaKhoa.Focus();
         }
 
-        
+        private void txbTimKiem_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) { 
+                btnTim.PerformClick();
+            }
+        }
+
+        private void btnTim_Click(object sender, EventArgs e)
+        {
+            string tuKhoa = txbTimKiem.Text.Trim();
+            if (string.IsNullOrEmpty(tuKhoa)) { 
+                LoadData(); return; 
+            }
+
+            try
+            {
+                if (conn.State == ConnectionState.Closed) conn.Open();
+              
+                string sql = @"SELECT * FROM KHOA 
+                               WHERE MaKhoa LIKE '%' + @kw + '%' 
+                                  OR TenKhoa COLLATE SQL_Latin1_General_CP1_CI_AI LIKE N'%' + @kw + '%'";
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@kw", tuKhoa);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+
+                dataGridView1.DataSource = dt;
+                if (dt.Rows.Count == 0)
+                {
+                    MessageBox.Show("Không tìm thấy Khoa nào phù hợp!", "Thông báo");
+                }
+            }
+            catch (Exception ex) { 
+                MessageBox.Show("Lỗi tìm kiếm: " + ex.Message); 
+            }
+        }
     }
 }

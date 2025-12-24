@@ -23,6 +23,19 @@ namespace ProjectQuanLySinhVien.GUI
                 btnThem.Enabled = false;
                 btnSua.Enabled = false;
                 btnXoa.Enabled = false;
+                txtDiem.ReadOnly = true;
+                txtMaSV.ReadOnly = true;
+                txtTenSV.ReadOnly = true;
+                this.Text = "Quản Lý Điểm (Quyền: Nhân viên - Chỉ xem)";
+            }
+            else
+            {
+                btnThem.Enabled = true;
+                btnSua.Enabled = true;
+                btnXoa.Enabled = true;
+
+                txtDiem.ReadOnly = false;
+                this.Text = "Quản Lý Điểm (Quyền: Admin)";
             }
         }
         private object GetComboBoxValue(ComboBox cb)
@@ -51,41 +64,30 @@ namespace ProjectQuanLySinhVien.GUI
             {
                 conn = new SqlConnection(strKetNoi);
                 conn.Open();
-
-                // Load Lớp
                 SqlDataAdapter daLop = new SqlDataAdapter("SELECT MaLop, TenLop FROM LOP", conn);
                 DataTable dtLop = new DataTable();
                 daLop.Fill(dtLop);
                 cboLop.DataSource = dtLop;
                 cboLop.DisplayMember = "TenLop";
                 cboLop.ValueMember = "MaLop";
-
-                // Load Môn Học
                 SqlDataAdapter daMon = new SqlDataAdapter("SELECT MaMH, TenMH FROM MONHOC", conn);
                 DataTable dtMon = new DataTable();
                 daMon.Fill(dtMon);
                 cboMonHoc.DataSource = dtMon;
                 cboMonHoc.DisplayMember = "TenMH";
                 cboMonHoc.ValueMember = "MaMH";
-
-                // Đặt mặc định chưa chọn gì
                 cboLop.SelectedIndex = -1;
                 cboMonHoc.SelectedIndex = -1;
             }
             catch (Exception ex) { MessageBox.Show("Lỗi kết nối: " + ex.Message); }
         }
-
-        // --- 2. LOAD DANH SÁCH SINH VIÊN & ĐIỂM ---
         private void LoadDiemSinhVien()
         {
-            // Chỉ load khi đã chọn đủ cả Lớp và Môn
             if (GetComboBoxValue(cboLop) == null || GetComboBoxValue(cboMonHoc) == null) return;
 
             try
             {
                 if (conn.State == ConnectionState.Closed) conn.Open();
-
-                // Lấy tất cả SV lớp đó, nếu có điểm thì hiện, chưa có thì hiện NULL
                 string sql = @"
                     SELECT 
                         sv.MaSV, 
@@ -108,8 +110,6 @@ namespace ProjectQuanLySinhVien.GUI
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
-
-        // --- SỰ KIỆN CHỌN COMBOBOX ---
         private void cboLop_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadDiemSinhVien();
@@ -119,8 +119,6 @@ namespace ProjectQuanLySinhVien.GUI
         {
             LoadDiemSinhVien();
         }
-
-        // --- SỰ KIỆN CLICK BẢNG ---
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -132,8 +130,6 @@ namespace ProjectQuanLySinhVien.GUI
                 txtDiem.Focus(); 
             }
         }
-
-        // --- NÚT THÊM (Chỉ dùng khi chưa có điểm) ---
         private void btnThem_Click(object sender, EventArgs e)
         {
             if (!CheckInput()) return;
@@ -141,15 +137,11 @@ namespace ProjectQuanLySinhVien.GUI
             try
             {
                 if (conn.State == ConnectionState.Closed) conn.Open();
-
-                // Kiểm tra xem đã có điểm chưa
                 if (KiemTraDiemTonTai())
                 {
                     MessageBox.Show("Sinh viên này đã có điểm môn này rồi! Vui lòng dùng nút SỬA.");
                     return;
                 }
-
-                // Nếu chưa có thì Thêm mới
                 string sql = "INSERT INTO KETQUA (MaSV, MaMH, DiemSo) VALUES (@sv, @mh, @d)";
                 ExecuteSQL(sql);
                 MessageBox.Show("Nhập điểm thành công!");
@@ -157,8 +149,6 @@ namespace ProjectQuanLySinhVien.GUI
             }
             catch (Exception ex) { MessageBox.Show("Lỗi: " + ex.Message); }
         }
-
-        // --- NÚT SỬA (Chỉ dùng khi đã có điểm) ---
         private void btnSua_Click(object sender, EventArgs e)
         {
             if (!CheckInput()) return;
@@ -166,15 +156,11 @@ namespace ProjectQuanLySinhVien.GUI
             try
             {
                 if (conn.State == ConnectionState.Closed) conn.Open();
-
-                // Kiểm tra xem có điểm để sửa không
                 if (!KiemTraDiemTonTai())
                 {
                     MessageBox.Show("Sinh viên này chưa có điểm! Vui lòng dùng nút THÊM.");
                     return;
                 }
-
-                // Nếu có rồi thì Update
                 string sql = "UPDATE KETQUA SET DiemSo=@d WHERE MaSV=@sv AND MaMH=@mh";
                 ExecuteSQL(sql);
                 MessageBox.Show("Sửa điểm thành công!");
@@ -182,8 +168,6 @@ namespace ProjectQuanLySinhVien.GUI
             }
             catch (Exception ex) { MessageBox.Show("Lỗi: " + ex.Message); }
         }
-
-        // --- NÚT XÓA ---
         private void btnXoa_Click(object sender, EventArgs e)
         {
             if (txtMaSV.Text == "") return;
@@ -194,8 +178,6 @@ namespace ProjectQuanLySinhVien.GUI
                 {
                     if (conn.State == ConnectionState.Closed) conn.Open();
                     string sql = "DELETE FROM KETQUA WHERE MaSV=@sv AND MaMH=@mh";
-
-                    // Code xóa đặc biệt vì Delete không cần tham số DiemSo
                     SqlCommand cmd = new SqlCommand(sql, conn);
                     cmd.Parameters.AddWithValue("@sv", txtMaSV.Text);
                     var maMH = GetComboBoxValue(cboMonHoc);
@@ -209,8 +191,6 @@ namespace ProjectQuanLySinhVien.GUI
                 catch (Exception ex) { MessageBox.Show("Lỗi xóa: " + ex.Message); }
             }
         }
-
-        // --- NÚT LÀM MỚI ---
         private void btnLamMoi_Click(object sender, EventArgs e)
         {
             LoadDiemSinhVien();
@@ -218,10 +198,6 @@ namespace ProjectQuanLySinhVien.GUI
             txtTenSV.Text = "";
             txtDiem.Text = "";
         }
-
-        // --- CÁC HÀM PHỤ TRỢ ---
-
-        // 1. Kiểm tra đầu vào
         private bool CheckInput()
         {
             if (txtMaSV.Text == "" || GetComboBoxValue(cboMonHoc) == null)
@@ -237,8 +213,6 @@ namespace ProjectQuanLySinhVien.GUI
             }
             return true;
         }
-
-        // 2. Kiểm tra xem điểm đã có trong SQL chưa
         private bool KiemTraDiemTonTai()
         {
             string check = "SELECT COUNT(*) FROM KETQUA WHERE MaSV=@sv AND MaMH=@mh";
@@ -249,8 +223,6 @@ namespace ProjectQuanLySinhVien.GUI
             int count = (int)cmdCheck.ExecuteScalar();
             return count > 0;
         }
-
-        // 3. Hàm thực thi SQL chung (Cho Thêm và Sửa)
         private void ExecuteSQL(string sql)
         {
             SqlCommand cmd = new SqlCommand(sql, conn);
@@ -259,6 +231,72 @@ namespace ProjectQuanLySinhVien.GUI
             cmd.Parameters.AddWithValue("@mh", maMH ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@d", float.Parse(txtDiem.Text));
             cmd.ExecuteNonQuery();
+        }
+
+        private void btnTim_Click(object sender, EventArgs e)
+        {
+            string tuKhoa = txbTimKiem.Text.Trim();
+            if (string.IsNullOrEmpty(tuKhoa))
+            {
+                LoadDiemSinhVien(); 
+                return;
+            }
+            if (cboLop.SelectedIndex == -1 || cboMonHoc.SelectedIndex == -1)
+            {
+                MessageBox.Show("Vui lòng chọn Lớp và Môn học trước khi tìm kiếm!", "Thông báo");
+                return;
+            }
+
+            try
+            {
+                
+                if (conn == null) conn = new SqlConnection(strKetNoi);
+                if (conn.State == ConnectionState.Closed) conn.Open();
+
+                
+                string sql = @"
+                SELECT sv.MaSV, sv.HoTen, kq.DiemSo
+                FROM SINHVIEN sv LEFT JOIN KETQUA kq ON sv.MaSV = kq.MaSV AND kq.MaMH = @mh
+                WHERE sv.MaLop = @lop AND (sv.HoTen COLLATE SQL_Latin1_General_CP1_CI_AI LIKE N'%' + @kw + '%' OR sv.MaSV LIKE '%' + @kw + '%')";
+
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    object vLop = cboLop.SelectedValue;
+                    if (vLop is DataRowView drvLop) vLop = drvLop["MaLop"];
+                    cmd.Parameters.AddWithValue("@lop", vLop);
+
+                    object vMon = cboMonHoc.SelectedValue;
+                    if (vMon is DataRowView drvMon) vMon = drvMon["MaMH"];
+                    cmd.Parameters.AddWithValue("@mh", vMon);
+
+                    cmd.Parameters.AddWithValue("@kw", tuKhoa);
+
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    
+                    dataGridView1.AutoGenerateColumns = false; 
+
+                    dataGridView1.DataSource = dt;
+
+                    if (dt.Rows.Count == 0)
+                    {
+                        MessageBox.Show("Không tìm thấy sinh viên nào trong danh sách này!", "Thông báo");
+                    }
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tìm kiếm: " + ex.Message);
+            }
+        }
+
+        private void txbTimKiem_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btnTim.PerformClick();
+            }
         }
     }
 }
