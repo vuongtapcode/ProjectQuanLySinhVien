@@ -52,7 +52,7 @@ Các tài khoản được khởi tạo sẵn trong cơ sở dữ liệu (Bảng
 *Cách 2: Clone bằng Git*
 Mở Terminal hoặc Git Bash và chạy lệnh sau:
 ```bash
-git clone [https://github.com/vuongtapcode/ProjectQuanLySinhVien.git](https://github.com/vuongtapcode/ProjectQuanLySinhVien.git)
+git clone https://github.com/vuongtapcode/ProjectQuanLySinhVien.git
 ```
 
 **Bước 2: Cấu hình Cơ sở dữ liệu**
